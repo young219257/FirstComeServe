@@ -35,4 +35,7 @@ out/
 
 ### VS Code ###
 .vscode/
+# Ignore application properties file
 application.properties
+
+docker-compose.yml
