@@ -17,7 +17,7 @@ import java.security.SignatureException;
 import java.util.Base64;
 import java.util.Date;
 
-@Slf4j(topic = "JwtUtil")
+@Slf4j(topic = "JwtUtils")
 @Component
 public class JwtUtils {
     // Header KEY 값

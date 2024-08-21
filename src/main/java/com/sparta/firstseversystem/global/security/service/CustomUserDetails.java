@@ -1,12 +1,14 @@
 package com.sparta.firstseversystem.global.security.service;
 
 import com.sparta.firstseversystem.user.entity.User;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
+@Slf4j(topic = "CustomUserDetails")
 public class CustomUserDetails implements UserDetails {
     private final User user;
 
