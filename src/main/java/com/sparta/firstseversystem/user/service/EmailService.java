@@ -1,4 +1,4 @@
-package com.sparta.firstseversystem.global.service;
+package com.sparta.firstseversystem.user.service;
 
 
 import jakarta.mail.internet.MimeMessage;

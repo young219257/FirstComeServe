@@ -30,8 +30,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) //CSRF 비활성화
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/users/signup").permitAll()// 회원가입 경로 허용
-                        .requestMatchers("/api/users/varify").permitAll()
-                        .anyRequest().authenticated()) // 나머지 경로는 인증 필요
+                        .requestMatchers("/api/users/verify").permitAll()
+                        .anyRequest().authenticated())// 나머지 경로는 인증 필요
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // 세션 관리 STATELESS로 설정
 

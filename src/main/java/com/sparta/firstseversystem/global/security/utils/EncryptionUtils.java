@@ -1,4 +1,4 @@
-package com.sparta.firstseversystem.user.utils;
+package com.sparta.firstseversystem.global.security.utils;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;

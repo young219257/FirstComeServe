@@ -1,7 +1,7 @@
 package com.sparta.firstseversystem.user.entity;
 
 import com.sparta.firstseversystem.user.dto.SignupDto;
-import com.sparta.firstseversystem.user.utils.EncryptionUtils;
+import com.sparta.firstseversystem.global.security.utils.EncryptionUtils;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

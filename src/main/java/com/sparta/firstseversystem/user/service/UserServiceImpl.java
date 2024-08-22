@@ -1,10 +1,9 @@
 package com.sparta.firstseversystem.user.service;
 
-import com.sparta.firstseversystem.global.service.EmailService;
 import com.sparta.firstseversystem.user.dto.SignupDto;
 import com.sparta.firstseversystem.user.entity.User;
 import com.sparta.firstseversystem.user.repository.UserRepository;
-import com.sparta.firstseversystem.user.utils.EncryptionUtils;
+import com.sparta.firstseversystem.global.security.utils.EncryptionUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -48,7 +47,7 @@ public class UserServiceImpl implements UserService {
         String email = emailService.getEmailByToken(token);
 
         if (email != null) {
-            User user = userRepository.findByEmail(email);
+            User user = userRepository.findByEmail(EncryptionUtils.encrypt(email));
             if (user != null) {
                 user.setEmailVerified(true);
                 userRepository.save(user);

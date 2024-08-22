@@ -4,6 +4,7 @@ import com.sparta.firstseversystem.global.exception.handler.dto.ApiResponse;
 import com.sparta.firstseversystem.user.dto.SignupDto;
 import com.sparta.firstseversystem.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,7 +24,7 @@ public class UserController {
     }
 
     //이메일 인증 완료 시 브라우저에서 서버로 get요청
-    @GetMapping("/varify")
+    @GetMapping("/verify")
     public ApiResponse varifyEmail(@RequestParam("token") String token) {
         boolean isVerified = userService.verifyEmail(token);
         if (isVerified) {

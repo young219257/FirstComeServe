@@ -1,4 +1,4 @@
-package com.sparta.firstseversystem.global.service;
+package com.sparta.firstseversystem.user.service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -35,7 +35,7 @@ public class EmailServiceImpl implements EmailService {
         String toMail = email;
         String title = "이메일 인증 링크";
         String content = "이메일 인증 링크를 클릭하세요: " +
-                "<a href=\"http://localhost:8080/verify?token=" + token + "\">인증 링크</a>";
+                "<a href=\"http://localhost:8080/api/users/verify?token=" + token + "\">인증 링크</a>";
 
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         try {
@@ -63,8 +63,8 @@ public class EmailServiceImpl implements EmailService {
         MimeMessage mimeMessage = createMimeMessage(toEmail,token);
         javaMailSender.send(mimeMessage);
 
-        //토큰을 redis에 저장(키 : 토큰, 값: 이메일 주소)
-        redisTemplate.opsForValue().set("email", toEmail, Duration.ofMinutes(10));
+        // 토큰을 Redis에 저장(키: 토큰, 값: 이메일 주소)
+        redisTemplate.opsForValue().set(token, toEmail, Duration.ofMinutes(10));
 
     }
 
