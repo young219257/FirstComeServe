@@ -1,5 +1,7 @@
 package com.sparta.firstseversystem.user.service;
 
+import com.sparta.firstseversystem.global.exception.DuplicateResourceException;
+import com.sparta.firstseversystem.global.exception.ErrorCode;
 import com.sparta.firstseversystem.user.dto.SignupDto;
 import com.sparta.firstseversystem.user.entity.User;
 import com.sparta.firstseversystem.user.repository.UserRepository;
@@ -24,6 +26,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public void signup(SignupDto requestDto) {
 
+        if(userRepository.findByEmail(requestDto.getEmail()) == null){
+            throw new DuplicateResourceException(ErrorCode.DUPLICATE_EMAIL);
+        }
         User user = User.of(requestDto,encoder);
         userRepository.save(user);
 

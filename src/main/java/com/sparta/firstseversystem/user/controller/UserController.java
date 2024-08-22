@@ -1,5 +1,7 @@
 package com.sparta.firstseversystem.user.controller;
 
+import com.sparta.firstseversystem.global.exception.ErrorCode;
+import com.sparta.firstseversystem.global.exception.InvalidateTokenException;
 import com.sparta.firstseversystem.global.exception.handler.dto.ApiResponse;
 import com.sparta.firstseversystem.user.dto.SignupDto;
 import com.sparta.firstseversystem.user.service.UserService;
@@ -31,7 +33,7 @@ public class UserController {
             return ApiResponse.ok(200,"이메일 인증이 완료되었습니다.");
         }
         else{
-            return ApiResponse.error(400,"유효하지 않은 토큰입니다.");
+            throw new InvalidateTokenException(ErrorCode.VALIDATE_TOKEN);
         }
     }
 
