@@ -1,26 +1,19 @@
 package com.sparta.firstseversystem.global.config;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import java.util.Properties;
 
 @Configuration
-@PropertySource("classpath:mailAuth.properties")
-@ConfigurationProperties(prefix = "mail")
-@Getter
-@Setter
-@ToString
 public class MailConfig {
 
+    @Value("${spring.mail.username}")
     private String username;
+    @Value("${spring.mail.password}")
     private String password;
 
     @Bean
