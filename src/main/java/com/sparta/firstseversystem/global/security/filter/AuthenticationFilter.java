@@ -2,7 +2,6 @@ package com.sparta.firstseversystem.global.security.filter;
 
 
 import com.sparta.firstseversystem.global.security.utils.JwtUtils;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -14,6 +13,6 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter{
 
     public AuthenticationFilter(JwtUtils jwtUtils) {
         this.jwtUtils = jwtUtils;
-        setFilterProcessesUrl("/api/members/login");
+        setFilterProcessesUrl("/api/users/login");
     }
 }
