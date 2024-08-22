@@ -2,6 +2,7 @@ package com.sparta.firstseversystem.global.exception.handler;
 
 import com.sparta.firstseversystem.global.exception.DuplicateResourceException;
 import com.sparta.firstseversystem.global.exception.InvalidateTokenException;
+import com.sparta.firstseversystem.global.exception.NotfoundResourceException;
 import com.sparta.firstseversystem.global.exception.RestApiException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -29,5 +30,10 @@ public class GlobalExceptionHandler {
         RestApiException restApiException=new RestApiException(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
         return new ResponseEntity<>(restApiException, HttpStatus.BAD_REQUEST);
 
+    }
+    @ExceptionHandler(NotfoundResourceException.class)
+    public ResponseEntity NotFoundResourceException(NotfoundResourceException ex) {
+        RestApiException restApiException=new RestApiException(HttpStatus.NOT_FOUND.value(), ex.getMessage());
+        return new ResponseEntity<>(restApiException, HttpStatus.NOT_FOUND);
     }
 }

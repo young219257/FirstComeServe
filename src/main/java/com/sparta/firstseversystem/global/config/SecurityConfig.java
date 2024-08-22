@@ -31,6 +31,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/users/signup").permitAll()// 회원가입 경로 허용
                         .requestMatchers("/api/users/verify").permitAll()
+                        .requestMatchers("/api/products/**").permitAll()
                         .anyRequest().authenticated())// 나머지 경로는 인증 필요
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // 세션 관리 STATELESS로 설정
