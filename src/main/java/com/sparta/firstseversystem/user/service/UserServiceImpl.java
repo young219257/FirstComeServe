@@ -26,7 +26,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void signup(SignupDto requestDto) {
 
-        if(userRepository.findByEmail(requestDto.getEmail()) == null){
+        if(userRepository.findByEmail(requestDto.getEmail()) != null){
             throw new DuplicateResourceException(ErrorCode.DUPLICATE_EMAIL);
         }
         User user = User.of(requestDto,encoder);
