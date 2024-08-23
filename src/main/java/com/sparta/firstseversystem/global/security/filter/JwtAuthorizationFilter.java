@@ -32,13 +32,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        String requestURI = request.getRequestURI();
 
-        // 로그인 경로는 JWT 검증을 수행하지 않음
-        if (requestURI.equals("/api/users/login")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
         String authorization = jwtUtils.getJwtFromHeader(request);
         log.info("Authorization 헤더: {}", authorization);
 
@@ -60,7 +54,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 return;
             }
         }
-
         // 필터 체인을 계속 진행시킵니다.
         filterChain.doFilter(request, response);
     }
