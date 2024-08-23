@@ -1,6 +1,8 @@
 package com.sparta.firstseversystem.domain.order.entity;
 
 
+import com.sparta.firstseversystem.domain.delivery.entity.Delivery;
+import com.sparta.firstseversystem.domain.order.type.OrderStatus;
 import com.sparta.firstseversystem.domain.user.entity.User;
 import com.sparta.firstseversystem.global.entity.TimeStamped;
 import jakarta.persistence.*;
@@ -10,7 +12,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Builder
@@ -27,6 +28,7 @@ public class Order extends TimeStamped {
     private String orderer;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
     @Column(nullable = false)
@@ -38,4 +40,7 @@ public class Order extends TimeStamped {
 
     @OneToMany(mappedBy = "order",cascade = CascadeType.REMOVE)
     private List<OrderItem> orderItems;
+
+    @OneToOne(mappedBy = "order",cascade = CascadeType.REMOVE)
+    private Delivery delivery;
 }
