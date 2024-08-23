@@ -40,6 +40,7 @@ public class UserController {
     /**로그인 api
      @Param : email, password
      @return : 성공 여부
+     @Header : Bearer 토큰 -> accessToken
      **/
 
 

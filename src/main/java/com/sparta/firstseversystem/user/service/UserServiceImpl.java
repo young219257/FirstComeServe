@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService {
         String email = emailService.getEmailByToken(token);
 
         if (email != null) {
-            User user = userRepository.findByEmail(EncryptionUtils.encrypt(email));
+            User user = userRepository.findByEmail(EncryptionUtils.encrypt(email)).orElse(null);
             if (user != null) {
                 user.setEmailVerified(true);
                 userRepository.save(user);
