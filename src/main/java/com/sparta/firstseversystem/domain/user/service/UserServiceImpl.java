@@ -1,10 +1,11 @@
-package com.sparta.firstseversystem.user.service;
+package com.sparta.firstseversystem.domain.user.service;
 
+import com.sparta.firstseversystem.domain.user.dto.SignupDto;
+import com.sparta.firstseversystem.domain.user.entity.User;
+import com.sparta.firstseversystem.domain.user.repository.UserRepository;
 import com.sparta.firstseversystem.global.exception.DuplicateResourceException;
 import com.sparta.firstseversystem.global.exception.ErrorCode;
-import com.sparta.firstseversystem.user.dto.SignupDto;
-import com.sparta.firstseversystem.user.entity.User;
-import com.sparta.firstseversystem.user.repository.UserRepository;
+import com.sparta.firstseversystem.global.exception.NotfoundResourceException;
 import com.sparta.firstseversystem.global.security.utils.EncryptionUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -52,7 +53,7 @@ public class UserServiceImpl implements UserService {
         String email = emailService.getEmailByToken(token);
 
         if (email != null) {
-            User user = userRepository.findByEmail(EncryptionUtils.encrypt(email));
+            User user = userRepository.findByEmail(EncryptionUtils.encrypt(email)).orElseThrow(()->new NotfoundResourceException(ErrorCode.NOTFOUND_USER));
             if (user != null) {
                 user.setEmailVerified(true);
                 userRepository.save(user);

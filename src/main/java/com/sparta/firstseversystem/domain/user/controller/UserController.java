@@ -1,12 +1,11 @@
-package com.sparta.firstseversystem.user.controller;
+package com.sparta.firstseversystem.domain.user.controller;
 
+import com.sparta.firstseversystem.domain.user.dto.SignupDto;
+import com.sparta.firstseversystem.domain.user.service.UserService;
 import com.sparta.firstseversystem.global.exception.ErrorCode;
 import com.sparta.firstseversystem.global.exception.InvalidateTokenException;
 import com.sparta.firstseversystem.global.exception.handler.dto.ApiResponse;
-import com.sparta.firstseversystem.user.dto.SignupDto;
-import com.sparta.firstseversystem.user.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -36,11 +35,6 @@ public class UserController {
             throw new InvalidateTokenException(ErrorCode.VALIDATE_TOKEN);
         }
     }
-
-    /**로그인 api
-     @Param : email, password
-     @return : 성공 여부
-     **/
 
 
     /**로그아웃 api
