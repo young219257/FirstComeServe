@@ -1,4 +1,4 @@
-package com.sparta.firstseversystem.user.dto;
+package com.sparta.firstseversystem.domain.user.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
