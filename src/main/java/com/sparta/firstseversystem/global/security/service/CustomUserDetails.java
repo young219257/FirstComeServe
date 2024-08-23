@@ -1,6 +1,6 @@
 package com.sparta.firstseversystem.global.security.service;
 
-import com.sparta.firstseversystem.user.entity.User;
+import com.sparta.firstseversystem.domain.user.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

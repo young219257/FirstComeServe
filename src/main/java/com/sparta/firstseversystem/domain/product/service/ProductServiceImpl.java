@@ -1,20 +1,18 @@
-package com.sparta.firstseversystem.product.service;
+package com.sparta.firstseversystem.domain.product.service;
 
 
+import com.sparta.firstseversystem.domain.product.dto.ProductListResponseDto;
+import com.sparta.firstseversystem.domain.product.dto.ProductResponseDto;
+import com.sparta.firstseversystem.domain.product.entity.Product;
+import com.sparta.firstseversystem.domain.product.repository.ProductRepository;
 import com.sparta.firstseversystem.global.exception.ErrorCode;
 import com.sparta.firstseversystem.global.exception.NotfoundResourceException;
-import com.sparta.firstseversystem.product.dto.ProductListResponseDto;
-import com.sparta.firstseversystem.product.dto.ProductResponseDto;
-import com.sparta.firstseversystem.product.entity.Product;
-import com.sparta.firstseversystem.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

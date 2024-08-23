@@ -1,7 +1,7 @@
-package com.sparta.firstseversystem.product.service;
+package com.sparta.firstseversystem.domain.product.service;
 
-import com.sparta.firstseversystem.product.dto.ProductListResponseDto;
-import com.sparta.firstseversystem.product.dto.ProductResponseDto;
+import com.sparta.firstseversystem.domain.product.dto.ProductListResponseDto;
+import com.sparta.firstseversystem.domain.product.dto.ProductResponseDto;
 import org.springframework.data.domain.Page;
 
 public interface ProductService {

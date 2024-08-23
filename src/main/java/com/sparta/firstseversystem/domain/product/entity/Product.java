@@ -1,4 +1,4 @@
-package com.sparta.firstseversystem.product.entity;
+package com.sparta.firstseversystem.domain.product.entity;
 
 import com.sparta.firstseversystem.global.entity.TimeStamped;
 import jakarta.persistence.*;

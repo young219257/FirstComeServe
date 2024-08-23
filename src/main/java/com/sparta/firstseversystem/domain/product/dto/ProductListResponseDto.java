@@ -1,7 +1,6 @@
-package com.sparta.firstseversystem.product.dto;
+package com.sparta.firstseversystem.domain.product.dto;
 
 
-import com.sparta.firstseversystem.product.entity.Product;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

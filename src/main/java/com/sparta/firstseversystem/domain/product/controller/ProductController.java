@@ -1,11 +1,10 @@
-package com.sparta.firstseversystem.product.controller;
+package com.sparta.firstseversystem.domain.product.controller;
 
 
+import com.sparta.firstseversystem.domain.product.dto.ProductListResponseDto;
+import com.sparta.firstseversystem.domain.product.dto.ProductResponseDto;
+import com.sparta.firstseversystem.domain.product.service.ProductService;
 import com.sparta.firstseversystem.global.exception.handler.dto.ApiResponse;
-import com.sparta.firstseversystem.product.dto.ProductListResponseDto;
-import com.sparta.firstseversystem.product.dto.ProductResponseDto;
-import com.sparta.firstseversystem.product.entity.Product;
-import com.sparta.firstseversystem.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;

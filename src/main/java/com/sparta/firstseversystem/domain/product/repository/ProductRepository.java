@@ -1,7 +1,7 @@
-package com.sparta.firstseversystem.product.repository;
+package com.sparta.firstseversystem.domain.product.repository;
 
 
-import com.sparta.firstseversystem.product.entity.Product;
+import com.sparta.firstseversystem.domain.product.entity.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

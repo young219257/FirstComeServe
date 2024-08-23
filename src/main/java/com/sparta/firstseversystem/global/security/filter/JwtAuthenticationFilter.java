@@ -7,7 +7,7 @@ import com.sparta.firstseversystem.global.security.service.CustomUserDetailsServ
 import com.sparta.firstseversystem.global.security.utils.EncryptionUtils;
 import com.sparta.firstseversystem.global.security.utils.JwtUtils;
 
-import com.sparta.firstseversystem.user.dto.LoginRequestDto;
+import com.sparta.firstseversystem.domain.user.dto.LoginRequestDto;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

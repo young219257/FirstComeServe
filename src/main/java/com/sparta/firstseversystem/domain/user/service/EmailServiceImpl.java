@@ -1,4 +1,4 @@
-package com.sparta.firstseversystem.user.service;
+package com.sparta.firstseversystem.domain.user.service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
