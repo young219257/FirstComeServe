@@ -1,6 +1,7 @@
 package com.sparta.firstseversystem.domain.wishlist.service;
 
 
+import com.sparta.firstseversystem.domain.product.dto.ProductResponseDto;
 import com.sparta.firstseversystem.domain.user.entity.User;
 import com.sparta.firstseversystem.domain.wishlist.dto.WishListRequestDto;
 import com.sparta.firstseversystem.domain.wishlist.dto.WishListResponseDto;
@@ -14,4 +15,6 @@ public interface WishListService {
     void updateWishListItemQuantity(User user, Long wishListItemId, WishListRequestDto wishListUpdateRequestDto);
 
     void deleteWishListItem(User user, Long wishListItemId);
+
+    ProductResponseDto getWishlistItem(User user, Long wishListItemId);
 }

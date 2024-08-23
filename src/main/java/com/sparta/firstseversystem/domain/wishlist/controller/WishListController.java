@@ -1,8 +1,10 @@
 package com.sparta.firstseversystem.domain.wishlist.controller;
 
+import com.sparta.firstseversystem.domain.product.dto.ProductResponseDto;
 import com.sparta.firstseversystem.domain.user.entity.User;
 import com.sparta.firstseversystem.domain.wishlist.dto.WishListRequestDto;
 import com.sparta.firstseversystem.domain.wishlist.dto.WishListResponseDto;
+import com.sparta.firstseversystem.domain.wishlist.entity.WishListItem;
 import com.sparta.firstseversystem.domain.wishlist.service.WishListService;
 import com.sparta.firstseversystem.global.exception.handler.dto.ApiResponse;
 import com.sparta.firstseversystem.global.security.service.CustomUserDetails;
@@ -54,6 +56,18 @@ public class WishListController {
     }
 
     /**
+     * wishlist의 item의 정보를 상세 조회하는 메소드
+     * @Param wishlistItemId
+     * @RequestDto =null
+     * return WishListItemResponseDto
+     **/
+    @GetMapping("/{wishListItemId}")
+    public ApiResponse<ProductResponseDto> getWishListItem(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                           @PathVariable Long wishListItemId) {
+        ProductResponseDto productResponseDto= wishlistService.getWishlistItem(customUserDetails.getUser(),wishListItemId);
+        return ApiResponse.ok(HttpStatus.OK.value(), "위시리스트 상품 상세 조회에 성공하셨습니다.",productResponseDto);
+    }
+    /**
      *wishlist 수량 수정 메소드
      * @Param wishlistItemId
      * @RequestDto quantity
@@ -77,7 +91,7 @@ public class WishListController {
     public ApiResponse deleteWishListItem(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                                           @PathVariable("wishListItemId") Long wishListItemId){
         wishlistService.deleteWishListItem(customUserDetails.getUser(),wishListItemId);
-        return ApiResponse.ok(HttpStatus.OK.value(), "상품이 삭제되었습니다.");
+        return ApiResponse.ok(HttpStatus.OK.value(), "해당 상품이 위시리스트에서 삭제되었습니다.");
 
     }
 

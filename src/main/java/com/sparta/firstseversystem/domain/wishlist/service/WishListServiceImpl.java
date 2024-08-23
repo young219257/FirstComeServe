@@ -1,7 +1,9 @@
 package com.sparta.firstseversystem.domain.wishlist.service;
 
+import com.sparta.firstseversystem.domain.product.dto.ProductResponseDto;
 import com.sparta.firstseversystem.domain.product.entity.Product;
 import com.sparta.firstseversystem.domain.product.repository.ProductRepository;
+import com.sparta.firstseversystem.domain.product.service.ProductService;
 import com.sparta.firstseversystem.domain.user.entity.User;
 import com.sparta.firstseversystem.domain.wishlist.dto.WishListRequestDto;
 import com.sparta.firstseversystem.domain.wishlist.dto.WishListResponseDto;
@@ -22,16 +24,13 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class WishListServiceImpl implements WishListService {
+
     private final WishListRepository wishlistRepository;
     private final ProductRepository productRepository;
     private final WishListItemRepository wishListItemRepository;
+    private final ProductService productService;
 
-    /**
-     * 상품을 wishlist에 추가하는 메소드
-     * @Param wishlistId
-     * @RequestDto {productId, quantity}
-     * return 성공 여부
-     **/
+    /**위시리스트 품목 추가 메소드 **/
     @Override
     public void addProductToWishlist(User user, Long wishlistId, WishListRequestDto wishListRequestDto) {
         WishList wishList=findWishlist(wishlistId);
@@ -50,6 +49,7 @@ public class WishListServiceImpl implements WishListService {
         wishListItemRepository.save(wishListItem); //위시리스트에 상품 담기
     }
 
+    /**위시리스트 목록 조회 메소드**/
     @Override
     public Page<WishListResponseDto> getWishlist(User user, Long wishlistId, int page, int size, String sortBy, boolean isAsc) {
 
@@ -68,6 +68,14 @@ public class WishListServiceImpl implements WishListService {
         return wishlists.map(wishList -> new WishListResponseDto());
     }
 
+    /**위시리스트 품목 상세 조회 메소드**/
+    @Override
+    public ProductResponseDto getWishlistItem(User user, Long wishListItemId) {
+        WishListItem wishListItem=findWishlistItem(wishListItemId);
+        return productService.getProduct(wishListItem.getProduct().getId());
+    }
+
+    /**위시리스트 품목 수량 변경 메소드 **/
     @Override
     public void updateWishListItemQuantity(User user, Long wishListItemId, WishListRequestDto wishListUpdateRequestDto) {
         WishListItem wishListItem=findWishlistItem(wishListItemId);
@@ -75,10 +83,12 @@ public class WishListServiceImpl implements WishListService {
         wishListItemRepository.save(wishListItem);
     }
 
+    /**위시리스트 품목 삭제 메소드 **/
     @Override
     public void deleteWishListItem(User user, Long wishListItemId) {
         wishListItemRepository.delete(findWishlistItem(wishListItemId));
     }
+
 
 
     //위시리스트를 찾는 메소드
