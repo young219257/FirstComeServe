@@ -1,4 +1,4 @@
-package com.sparta.firstseversystem.domain.order.entity;
+package com.sparta.firstseversystem.domain.order.type;
 
 import lombok.RequiredArgsConstructor;
 
