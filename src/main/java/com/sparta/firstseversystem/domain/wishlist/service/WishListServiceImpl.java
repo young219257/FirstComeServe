@@ -11,6 +11,7 @@ import com.sparta.firstseversystem.domain.wishlist.repository.WishListItemReposi
 import com.sparta.firstseversystem.domain.wishlist.repository.WishListRepository;
 import com.sparta.firstseversystem.global.exception.ErrorCode;
 import com.sparta.firstseversystem.global.exception.NotfoundResourceException;
+import com.sparta.firstseversystem.global.exception.UnAuthorizedAccessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,6 +35,11 @@ public class WishListServiceImpl implements WishListService {
     @Override
     public void addProductToWishlist(User user, Long wishlistId, WishListRequestDto wishListRequestDto) {
         WishList wishList=findWishlist(wishlistId);
+
+        //wishList의 주인장(?)이 현재 접근하려는 user와 다를 경우
+        if(!wishList.getUser().getId().equals(user.getId())) {
+            throw new UnAuthorizedAccessException(ErrorCode.NOT_ACCESS_WISHLIST);
+        }
         Product product=productRepository.findById(wishListRequestDto.getProductId()).orElseThrow(()->new NotfoundResourceException(ErrorCode.NOTFOUND_PRODUCT));
         WishListItem wishListItem=WishListItem.builder().
                 wishList(wishList).
@@ -46,6 +52,14 @@ public class WishListServiceImpl implements WishListService {
 
     @Override
     public Page<WishListResponseDto> getWishlist(User user, Long wishlistId, int page, int size, String sortBy, boolean isAsc) {
+
+        WishList wishlist=findWishlist(wishlistId);
+
+        //wishList의 주인장(?)이 현재 접근하려는 user와 다를 경우
+        if(!wishlist.getUser().getId().equals(user.getId())) {
+            throw new UnAuthorizedAccessException(ErrorCode.NOT_ACCESS_WISHLIST);
+        }
+
         // 정렬 방향 설정
         Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
