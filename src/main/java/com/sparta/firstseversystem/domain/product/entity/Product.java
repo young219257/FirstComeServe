@@ -29,6 +29,7 @@ public class Product extends TimeStamped {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Category category;
+
     @Column(nullable = false)
     private String description;
 
