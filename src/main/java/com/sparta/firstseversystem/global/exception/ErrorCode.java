@@ -13,8 +13,11 @@ public enum ErrorCode {
     NOTFOUND_USER(HttpStatus.NOT_FOUND,"존재하지 않는 사용자입니다."),
 
     //상품 관련
-    NOTFOUND_PRODUCT(HttpStatus.NOT_FOUND,"존재하지 않는 상품 id 입니다.");
+    NOTFOUND_PRODUCT(HttpStatus.NOT_FOUND,"존재하지 않는 상품 id 입니다."),
 
+    //위시리스트 관련
+    NOTFOUND_WISHLIST(HttpStatus.NOT_FOUND,"존재하지 않는 위시리스트입니다."),
+    NOTFOUND_WISHLISTITEM(HttpStatus.NOT_FOUND,"위시리스트에 존재하지 않는 상품입니다.");
     private final HttpStatus status;
     private final String message;
 
