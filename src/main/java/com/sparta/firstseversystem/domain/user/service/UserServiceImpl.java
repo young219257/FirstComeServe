@@ -3,6 +3,8 @@ package com.sparta.firstseversystem.domain.user.service;
 import com.sparta.firstseversystem.domain.user.dto.SignupDto;
 import com.sparta.firstseversystem.domain.user.entity.User;
 import com.sparta.firstseversystem.domain.user.repository.UserRepository;
+import com.sparta.firstseversystem.domain.wishlist.entity.WishList;
+import com.sparta.firstseversystem.domain.wishlist.repository.WishListRepository;
 import com.sparta.firstseversystem.global.exception.DuplicateResourceException;
 import com.sparta.firstseversystem.global.exception.ErrorCode;
 import com.sparta.firstseversystem.global.exception.NotfoundResourceException;
@@ -21,6 +23,7 @@ public class UserServiceImpl implements UserService {
     private final BCryptPasswordEncoder encoder;
     private final EmailService emailService;
     private final RedisTemplate<String, String> redisTemplate;
+    private final WishListRepository wishlistRepository;
 
 
     //회원가입
@@ -32,6 +35,12 @@ public class UserServiceImpl implements UserService {
         }
         User user = User.of(requestDto,encoder);
         userRepository.save(user);
+
+        //회원가입과 동시에 wishlist 생성
+        WishList wishlist = WishList.builder()
+                .user(user)
+                .build();
+        wishlistRepository.save(wishlist);
 
         //이메일 인증을 위한 이메일 전송
         emailService.sendEmail(EncryptionUtils.decrypt(user.getEmail()));

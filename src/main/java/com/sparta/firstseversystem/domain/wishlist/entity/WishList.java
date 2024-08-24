@@ -6,6 +6,7 @@ import com.sparta.firstseversystem.domain.user.entity.User;
 import com.sparta.firstseversystem.global.entity.TimeStamped;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -15,6 +16,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Table(name="wishlists")
 public class WishList extends TimeStamped {
     @Id
