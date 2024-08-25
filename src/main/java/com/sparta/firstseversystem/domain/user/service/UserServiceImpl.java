@@ -37,6 +37,12 @@ public class UserServiceImpl implements UserService {
         User user = User.of(requestDto,encoder);
         userRepository.save(user);
 
+        //wishlist 생성
+        WishList wishlist = WishList.builder()
+                .user(user)
+                .build();
+        wishlistRepository.save(wishlist);
+
         //이메일 인증을 위한 이메일 전송
         emailService.sendEmail(EncryptionUtils.decrypt(user.getEmail()));
 
