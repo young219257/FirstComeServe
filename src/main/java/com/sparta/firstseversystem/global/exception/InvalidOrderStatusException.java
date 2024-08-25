@@ -1,11 +1,9 @@
 package com.sparta.firstseversystem.global.exception;
 
-
-public class UnAuthorizedAccessException extends RuntimeException {
+public class InvalidOrderStatusException extends RuntimeException {
     private final ErrorCode errorCode;
-    public UnAuthorizedAccessException(ErrorCode errorCode) {
+    public InvalidOrderStatusException(ErrorCode errorCode) {
         super(errorCode.getMessage());
         this.errorCode = errorCode;
     }
 }
-

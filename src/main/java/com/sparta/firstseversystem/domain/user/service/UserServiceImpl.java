@@ -14,6 +14,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.util.Optional;
+
 
 @Service
 @RequiredArgsConstructor
@@ -30,17 +32,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public void signup(SignupDto requestDto) {
 
-        if(userRepository.findByEmail(requestDto.getEmail()) != null){
-            throw new DuplicateResourceException(ErrorCode.DUPLICATE_EMAIL);
-        }
+//        userRepository.findByEmail(EncryptionUtils.encrypt(requestDto.getEmail())).orElseThrow(()->new DuplicateResourceException(ErrorCode.DUPLICATE_EMAIL));
+
         User user = User.of(requestDto,encoder);
         userRepository.save(user);
-
-        //회원가입과 동시에 wishlist 생성
-        WishList wishlist = WishList.builder()
-                .user(user)
-                .build();
-        wishlistRepository.save(wishlist);
 
         //이메일 인증을 위한 이메일 전송
         emailService.sendEmail(EncryptionUtils.decrypt(user.getEmail()));
