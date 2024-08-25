@@ -3,10 +3,7 @@ package com.sparta.firstseversystem.domain.wishlist.entity;
 import com.sparta.firstseversystem.domain.product.entity.Product;
 import com.sparta.firstseversystem.global.entity.TimeStamped;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
@@ -21,6 +18,7 @@ public class WishListItem extends TimeStamped {
     private Long id;
 
     @Column(nullable = false)
+    @Setter
     private int quantity;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -31,4 +29,6 @@ public class WishListItem extends TimeStamped {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="product_id",nullable = false)
     private Product product;
+
+
 }
