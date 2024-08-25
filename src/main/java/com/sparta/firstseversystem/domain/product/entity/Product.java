@@ -4,10 +4,7 @@ import com.sparta.firstseversystem.domain.product.type.Category;
 import com.sparta.firstseversystem.domain.wishlist.entity.WishList;
 import com.sparta.firstseversystem.global.entity.TimeStamped;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -34,9 +31,10 @@ public class Product extends TimeStamped {
     private String description;
 
     @Column(nullable = false)
-    private int price;
+    private Long price;
 
     @Column(nullable = false)
+    @Setter
     private int stockQuantity;
 
 

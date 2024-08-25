@@ -16,7 +16,7 @@ public class ProductResponseDto {
     private Long productId;
     private String productName;
     private String productDescription;
-    private int productPrice;
+    private Long productPrice;
     private int productQuantity;
 
     public static ProductResponseDto of(Product product) {
