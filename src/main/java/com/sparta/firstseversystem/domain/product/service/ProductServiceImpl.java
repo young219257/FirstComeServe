@@ -26,8 +26,8 @@ public class ProductServiceImpl implements ProductService {
         Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
         Page<Product> products = productRepository.findAll(pageable);
-
-        return products.map(product -> new ProductListResponseDto());
+        // Product 객체를 ProductListResponseDto로 변환
+        return products.map(ProductListResponseDto::from);
     }
 
     @Override
