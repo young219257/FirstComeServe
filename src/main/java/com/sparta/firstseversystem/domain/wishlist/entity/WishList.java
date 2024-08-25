@@ -31,4 +31,6 @@ public class WishList extends TimeStamped {
     @OneToMany(mappedBy = "wishList",cascade = CascadeType.REMOVE)
     private List<WishListItem> wishListItems;
 
+
+
 }

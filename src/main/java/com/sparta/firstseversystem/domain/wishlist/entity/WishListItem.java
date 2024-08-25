@@ -30,5 +30,13 @@ public class WishListItem extends TimeStamped {
     @JoinColumn(name="product_id",nullable = false)
     private Product product;
 
+    public static WishListItem of(WishList wishList, Product product, int quantity) {
+        return WishListItem.builder()
+                .wishList(wishList)
+                .product(product)
+                .quantity(quantity)
+                .build();
+    }
+
 
 }

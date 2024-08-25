@@ -1,6 +1,7 @@
 package com.sparta.firstseversystem.domain.order.entity;
 
 
+import com.sparta.firstseversystem.domain.order.dto.OrderRequestDto;
 import com.sparta.firstseversystem.domain.product.entity.Product;
 import com.sparta.firstseversystem.global.entity.TimeStamped;
 import jakarta.persistence.*;
@@ -34,6 +35,15 @@ public class OrderItem extends TimeStamped {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="product_id",nullable = false)
     private Product product;
+
+
+    public static OrderItem of(Order order, Product product, OrderRequestDto orderRequestDto) {
+        return OrderItem.builder().
+                order(order).
+                product(product).
+                quantity(orderRequestDto.getQuantity()).
+                build();
+    }
 
 
 
