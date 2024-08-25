@@ -40,12 +40,7 @@ public class WishListServiceImpl implements WishListService {
         WishList wishList=findWishlist(user.getWishList().getId());
 
         //위시리스트에 wishlistItem 생성
-        WishListItem wishListItem=WishListItem.builder().
-                wishList(wishList).
-                product(product).
-                quantity(wishListRequestDto.
-                getQuantity()).
-                build();
+        WishListItem wishListItem=WishListItem.of(wishList,product,wishListRequestDto.getQuantity());
 
         wishListItemRepository.save(wishListItem); //위시리스트에 상품 담기
     }
@@ -55,19 +50,13 @@ public class WishListServiceImpl implements WishListService {
     @Transactional
     public Page<WishListResponseDto> getWishlist(User user, int page, int size, String sortBy, boolean isAsc) {
 
-        WishList wishlist=findWishlist(user.getWishList().getId());
-
-        //wishList의 주인장(?)이 현재 접근하려는 user와 다를 경우
-        if(!wishlist.getUser().getId().equals(user.getId())) {
-            throw new UnAuthorizedAccessException(ErrorCode.NOT_ACCESS_WISHLIST);
-        }
 
         // 정렬 방향 설정
         Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
 
         Page<WishListItem> wishlists = wishListItemRepository.findALlByWishListId(user.getWishList().getId(),pageable);
-        return wishlists.map(WishListResponseDto::of);
+        return wishlists.map(WishListResponseDto::from);
     }
 
     /**위시리스트 품목 상세 조회 메소드**/
