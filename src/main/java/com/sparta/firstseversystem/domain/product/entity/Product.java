@@ -1,7 +1,4 @@
 package com.sparta.firstseversystem.domain.product.entity;
-
-import com.sparta.firstseversystem.domain.product.type.Category;
-import com.sparta.firstseversystem.domain.wishlist.entity.WishList;
 import com.sparta.firstseversystem.global.entity.TimeStamped;
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,9 +20,6 @@ public class Product extends TimeStamped {
     @Column(nullable = false)
     private String productName;
 
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Category category;
 
     @Column(nullable = false)
     private String description;
