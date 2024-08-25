@@ -17,11 +17,8 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    /** 상품 페이지에서 해당 상품 주문하는 메소드
-     * @Param orderId
-     * @RequestDto productId, quantity
-     * return void
-     * **/
+
+    /** 상품 페이지에서 해당 상품 주문하는 메소드 **/
     @PostMapping
     public ApiResponse createOrder(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                                    @RequestBody OrderRequestDto orderRequestDto) {
@@ -29,11 +26,7 @@ public class OrderController {
         return ApiResponse.ok(HttpStatus.OK.value(), "상품 주문에 완료하였습니다.");
     }
 
-    /**
-     * 주문 정보 조회 메소드
-     * @Param page,size,sortBy,isAsc
-     * return OrderReponseDto
-     * **/
+    /**주문 정보 조회 메소드**/
     @GetMapping("/list")
     public ApiResponse<Page<OrderResponseDto>> getAllOrders(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                                                             @RequestParam(value = "page", defaultValue = "0") int page,
@@ -46,24 +39,17 @@ public class OrderController {
     }
 
     /** 주문 상품에 대한 취소 **/
-    /**
-     * @Param orderId
-     * return null
-     * **/
-    @DeleteMapping("/{orderId}")
+    @PutMapping("/{orderId}/cancel")
     public ApiResponse deleteOrder(@AuthenticationPrincipal CustomUserDetails customUserDetails,
-                                   @PathVariable("{orderId}") Long orderId) {
+                                   @PathVariable("orderId") Long orderId) {
         orderService.deleteOrder(customUserDetails.getUser(),orderId);
         return ApiResponse.ok(HttpStatus.OK.value(), "해당 주문이 취소되었습니다.");
     }
 
-    /**배송 완료 상품 반품
-     * @Param orderId
-     * return null
-     * **/
-    @PostMapping("/{orderId}")
+    /**배송 완료 상품 반품**/
+    @PutMapping("/{orderId}/return")
     public ApiResponse returnOrder(@AuthenticationPrincipal CustomUserDetails customUserDetails,
-                                     @PathVariable("{orderId}") Long orderId) {
+                                   @PathVariable("orderId") Long orderId) {
         orderService.returnOrder(customUserDetails.getUser(),orderId);
         return ApiResponse.ok(HttpStatus.OK.value(), "반품이 완료되었습니다.");
 
