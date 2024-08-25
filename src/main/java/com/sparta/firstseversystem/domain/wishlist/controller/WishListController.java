@@ -8,6 +8,7 @@ import com.sparta.firstseversystem.domain.wishlist.entity.WishListItem;
 import com.sparta.firstseversystem.domain.wishlist.service.WishListService;
 import com.sparta.firstseversystem.global.exception.handler.dto.ApiResponse;
 import com.sparta.firstseversystem.global.security.service.CustomUserDetails;
+import com.sparta.firstseversystem.global.security.utils.EncryptionUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -15,65 +16,44 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/wishlist")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class WishListController {
     private final WishListService wishlistService;
 
 
-    /**
-     * 상품을 wishlist에 추가하는 메소드
-     * @Param wishlistId
-     * @RequestDto {productId, quantity}
-     * return 성공 여부
-     **/
-    @PostMapping("/{wishlistId}")
+    /** 상품을 wishlist에 추가하는 메소드**/
+    @PostMapping("/wishlist")
     public ApiResponse addProductToWishlist(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                            @PathVariable("wishlistId") Long wishlistId,
                                             @RequestBody WishListRequestDto wishListRequestDto) {
-        wishlistService.addProductToWishlist(userDetails.getUser(),wishlistId,wishListRequestDto);
+        wishlistService.addProductToWishlist(userDetails.getUser(),wishListRequestDto);
         return ApiResponse.ok(HttpStatus.OK.value(), "위시리스트에 상품이 추가되었습니다.");
     }
 
-    /**
-     * wishlist의 상품 목록을 조회하는 메소드
-     * @Param wishlistId
-     * @RequestDto =null
-     * return ApiResponse<<Page>WishlistResponseDto>
-     **/
-    @GetMapping("/{wishlistId}")
+    /** wishlist의 상품 목록을 조회하는 메소드 **/
+    @GetMapping("/wishlists")
     public ApiResponse<Page<WishListResponseDto>> getWishlist(@AuthenticationPrincipal CustomUserDetails customUserDetails,
-                                                              @PathVariable("wishlistId") Long wishlistId,
                                                               @RequestParam(value = "page", defaultValue = "0") int page,
                                                               @RequestParam(value = "size", defaultValue = "10") int size,
                                                               @RequestParam(value = "sortBy", defaultValue = "createdAt") String sortBy,
                                                               @RequestParam(value = "isAsc", defaultValue = "false") boolean isAsc) {
 
         User user=customUserDetails.getUser();
-        wishlistService.getWishlist(user,wishlistId,page,size,sortBy,isAsc);
-        return ApiResponse.ok(HttpStatus.OK.value(),user.getUsername() + "님의 위시리스트 조회에 성공하였습니다.");
+        Page<WishListResponseDto> wishLists=wishlistService.getWishlist(user,page,size,sortBy,isAsc);
+        return ApiResponse.ok(HttpStatus.OK.value(), EncryptionUtils.decrypt(user.getUsername()) + "님의 위시리스트 조회에 성공하였습니다.",wishLists);
 
     }
 
-    /**
-     * wishlist의 item의 정보를 상세 조회하는 메소드
-     * @Param wishlistItemId
-     * @RequestDto =null
-     * return WishListItemResponseDto
-     **/
-    @GetMapping("/{wishListItemId}")
+    /**wishlist의 item의 정보를 상세 조회하는 메소드**/
+    @GetMapping("/wishlist/{wishListItemId}")
     public ApiResponse<ProductResponseDto> getWishListItem(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                                                            @PathVariable Long wishListItemId) {
         ProductResponseDto productResponseDto= wishlistService.getWishlistItem(customUserDetails.getUser(),wishListItemId);
         return ApiResponse.ok(HttpStatus.OK.value(), "위시리스트 상품 상세 조회에 성공하셨습니다.",productResponseDto);
     }
-    /**
-     *wishlist 수량 수정 메소드
-     * @Param wishlistItemId
-     * @RequestDto quantity
-     * return void
-     * **/
-    @PutMapping("/{wishListItemId}")
+
+    /**wishlist 수량 수정 메소드**/
+    @PutMapping("/wishlist/{wishListItemId}")
     public ApiResponse updateWishListItemQuantity(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                                                   @PathVariable("wishListItemId") Long wishListItemId,
                                                   @RequestBody WishListRequestDto wishListUpdateRequestDto){
@@ -81,13 +61,8 @@ public class WishListController {
         return ApiResponse.ok(HttpStatus.OK.value(), "상품의 수량이 변경되었습니다.");
     }
 
-    /**
-     *wishlist 삭제 메소드
-     * @Param wishlistItemId
-     * return void
-     * **/
-
-    @DeleteMapping("/{wishListItemId}")
+    /**wishlist 삭제 메소드**/
+    @DeleteMapping("/wishlist/{wishListItemId}")
     public ApiResponse deleteWishListItem(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                                           @PathVariable("wishListItemId") Long wishListItemId){
         wishlistService.deleteWishListItem(customUserDetails.getUser(),wishListItemId);

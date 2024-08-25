@@ -4,12 +4,10 @@ package com.sparta.firstseversystem.domain.delivery.entity;
 import com.sparta.firstseversystem.domain.delivery.type.DeliveryStatus;
 import com.sparta.firstseversystem.domain.order.entity.Order;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.security.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -30,15 +28,20 @@ public class Delivery {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
+    @Setter
     private DeliveryStatus deliveryStatus;
 
-    @Column(nullable = false)
-    private Timestamp startedAt;
+    @Column
+    @Setter
+    private LocalDateTime startedAt;
 
-    @Column(nullable = false)
-    private Timestamp completedAt;
+    @Column
+    @Setter
+    private LocalDateTime completedAt;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="order_id",nullable = false)
     private Order order;
+
+
 }

@@ -1,13 +1,7 @@
 package com.sparta.firstseversystem.domain.product.entity;
-
-import com.sparta.firstseversystem.domain.product.type.Category;
-import com.sparta.firstseversystem.domain.wishlist.entity.WishList;
 import com.sparta.firstseversystem.global.entity.TimeStamped;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -26,17 +20,15 @@ public class Product extends TimeStamped {
     @Column(nullable = false)
     private String productName;
 
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Category category;
 
     @Column(nullable = false)
     private String description;
 
     @Column(nullable = false)
-    private int price;
+    private Long price;
 
     @Column(nullable = false)
+    @Setter
     private int stockQuantity;
 
 

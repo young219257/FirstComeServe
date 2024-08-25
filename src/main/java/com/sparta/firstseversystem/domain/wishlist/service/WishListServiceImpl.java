@@ -14,6 +14,7 @@ import com.sparta.firstseversystem.domain.wishlist.repository.WishListRepository
 import com.sparta.firstseversystem.global.exception.ErrorCode;
 import com.sparta.firstseversystem.global.exception.NotfoundResourceException;
 import com.sparta.firstseversystem.global.exception.UnAuthorizedAccessException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,28 +33,29 @@ public class WishListServiceImpl implements WishListService {
 
     /**위시리스트 품목 추가 메소드 **/
     @Override
-    public void addProductToWishlist(User user, Long wishlistId, WishListRequestDto wishListRequestDto) {
-        WishList wishList=findWishlist(wishlistId);
+    public void addProductToWishlist(User user,WishListRequestDto wishListRequestDto) {
+        //상품
+        Product product=findProduct(wishListRequestDto.getProductId());
+        //user의 위시리스트
+        WishList wishList=findWishlist(user.getWishList().getId());
 
-        //wishList의 주인장(?)이 현재 접근하려는 user와 다를 경우
-        if(!wishList.getUser().getId().equals(user.getId())) {
-            throw new UnAuthorizedAccessException(ErrorCode.NOT_ACCESS_WISHLIST);
-        }
-        Product product=productRepository.findById(wishListRequestDto.getProductId()).orElseThrow(()->new NotfoundResourceException(ErrorCode.NOTFOUND_PRODUCT));
+        //위시리스트에 wishlistItem 생성
         WishListItem wishListItem=WishListItem.builder().
                 wishList(wishList).
                 product(product).
                 quantity(wishListRequestDto.
                 getQuantity()).
                 build();
+
         wishListItemRepository.save(wishListItem); //위시리스트에 상품 담기
     }
 
     /**위시리스트 목록 조회 메소드**/
     @Override
-    public Page<WishListResponseDto> getWishlist(User user, Long wishlistId, int page, int size, String sortBy, boolean isAsc) {
+    @Transactional
+    public Page<WishListResponseDto> getWishlist(User user, int page, int size, String sortBy, boolean isAsc) {
 
-        WishList wishlist=findWishlist(wishlistId);
+        WishList wishlist=findWishlist(user.getWishList().getId());
 
         //wishList의 주인장(?)이 현재 접근하려는 user와 다를 경우
         if(!wishlist.getUser().getId().equals(user.getId())) {
@@ -64,12 +66,13 @@ public class WishListServiceImpl implements WishListService {
         Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
 
-        Page<WishListItem> wishlists = wishListItemRepository.findALlByWishListId(wishlistId,pageable);
-        return wishlists.map(wishList -> new WishListResponseDto());
+        Page<WishListItem> wishlists = wishListItemRepository.findALlByWishListId(user.getWishList().getId(),pageable);
+        return wishlists.map(WishListResponseDto::of);
     }
 
     /**위시리스트 품목 상세 조회 메소드**/
     @Override
+    @Transactional
     public ProductResponseDto getWishlistItem(User user, Long wishListItemId) {
         WishListItem wishListItem=findWishlistItem(wishListItemId);
         return productService.getProduct(wishListItem.getProduct().getId());
@@ -77,24 +80,31 @@ public class WishListServiceImpl implements WishListService {
 
     /**위시리스트 품목 수량 변경 메소드 **/
     @Override
+    @Transactional
     public void updateWishListItemQuantity(User user, Long wishListItemId, WishListRequestDto wishListUpdateRequestDto) {
         WishListItem wishListItem=findWishlistItem(wishListItemId);
-        wishListItem.builder().quantity(wishListUpdateRequestDto.getQuantity()).build();
+        wishListItem.setQuantity(wishListUpdateRequestDto.getQuantity());
         wishListItemRepository.save(wishListItem);
     }
 
     /**위시리스트 품목 삭제 메소드 **/
     @Override
+    @Transactional
     public void deleteWishListItem(User user, Long wishListItemId) {
         wishListItemRepository.delete(findWishlistItem(wishListItemId));
     }
 
+    //상품 찾는 메소드
+    private Product findProduct(Long productId) {
+        return productRepository.findById(productId).orElseThrow(()->new NotfoundResourceException(ErrorCode.NOTFOUND_PRODUCT));
 
+    }
 
     //위시리스트를 찾는 메소드
-    private WishList findWishlist(Long wishlistId) {
-        return wishlistRepository.findById(wishlistId).orElseThrow(()-> new NotfoundResourceException(ErrorCode.NOTFOUND_WISHLIST));
+    private WishList findWishlist(Long wishListId) {
+        return wishlistRepository.findById(wishListId).orElseThrow(()-> new NotfoundResourceException(ErrorCode.NOTFOUND_WISHLIST));
     }
+
     //위시리스트 아이템을 찾는 메소드
     private WishListItem findWishlistItem(Long wishListItemId) {
 

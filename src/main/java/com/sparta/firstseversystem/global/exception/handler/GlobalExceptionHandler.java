@@ -1,9 +1,6 @@
 package com.sparta.firstseversystem.global.exception.handler;
 
-import com.sparta.firstseversystem.global.exception.DuplicateResourceException;
-import com.sparta.firstseversystem.global.exception.InvalidateTokenException;
-import com.sparta.firstseversystem.global.exception.NotfoundResourceException;
-import com.sparta.firstseversystem.global.exception.RestApiException;
+import com.sparta.firstseversystem.global.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -54,5 +51,17 @@ public class GlobalExceptionHandler {
     public ResponseEntity UsernameNotFoundException(UsernameNotFoundException ex) {
         RestApiException restApiException = new RestApiException(HttpStatus.UNAUTHORIZED.value(), ex.getMessage());
         return new ResponseEntity<>(restApiException, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(InvalidOrderStatusException.class)
+    public ResponseEntity InvalidOrderStatusException(InvalidOrderStatusException ex) {
+        RestApiException restApiException = new RestApiException(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+        return new ResponseEntity<>(restApiException, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InvalidReturnException.class)
+    public ResponseEntity InvalidReturnException(InvalidReturnException ex) {
+        RestApiException restApiException = new RestApiException(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+        return new ResponseEntity<>(restApiException, HttpStatus.BAD_REQUEST);
     }
 }

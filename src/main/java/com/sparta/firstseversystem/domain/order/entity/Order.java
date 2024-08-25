@@ -6,11 +6,9 @@ import com.sparta.firstseversystem.domain.order.type.OrderStatus;
 import com.sparta.firstseversystem.domain.user.entity.User;
 import com.sparta.firstseversystem.global.entity.TimeStamped;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -29,10 +27,16 @@ public class Order extends TimeStamped {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
+    @Setter
     private OrderStatus orderStatus;
 
     @Column(nullable = false)
     private long totalPrice;
+
+    @Column
+    @Setter
+    LocalDateTime returnSignedAt;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id",nullable = false)
@@ -43,4 +47,7 @@ public class Order extends TimeStamped {
 
     @OneToOne(mappedBy = "order",cascade = CascadeType.REMOVE)
     private Delivery delivery;
+
+
+
 }

@@ -9,6 +9,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Builder
 @AllArgsConstructor
@@ -23,6 +25,7 @@ public class OrderItem extends TimeStamped {
 
     @Column(nullable = false)
     private int quantity;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="order_id",nullable = false)
