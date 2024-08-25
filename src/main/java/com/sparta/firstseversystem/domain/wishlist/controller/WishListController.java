@@ -27,11 +27,10 @@ public class WishListController {
      * @RequestDto {productId, quantity}
      * return 성공 여부
      **/
-    @PostMapping("/{wishlistId}")
+    @PostMapping
     public ApiResponse addProductToWishlist(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                            @PathVariable("wishlistId") Long wishlistId,
                                             @RequestBody WishListRequestDto wishListRequestDto) {
-        wishlistService.addProductToWishlist(userDetails.getUser(),wishlistId,wishListRequestDto);
+        wishlistService.addProductToWishlist(userDetails.getUser(),wishListRequestDto);
         return ApiResponse.ok(HttpStatus.OK.value(), "위시리스트에 상품이 추가되었습니다.");
     }
 

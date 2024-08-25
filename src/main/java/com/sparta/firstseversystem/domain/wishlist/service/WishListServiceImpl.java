@@ -32,8 +32,21 @@ public class WishListServiceImpl implements WishListService {
 
     /**위시리스트 품목 추가 메소드 **/
     @Override
-    public void addProductToWishlist(User user, Long wishlistId, WishListRequestDto wishListRequestDto) {
-        WishList wishList=findWishlist(wishlistId);
+    public void addProductToWishlist(User user,WishListRequestDto wishListRequestDto) {
+        //위시리스트에 처음 품목을 담는 경우
+
+
+        if(user.getWishList()==null){
+
+            //wishlist 생성
+             WishList wishlist = WishList.builder()
+                    .user(user)
+                    .build();
+            wishlistRepository.save(wishlist);
+
+        }
+        WishList wishList=findWishlist(user.getWishList().getId());
+
 
         //wishList의 주인장(?)이 현재 접근하려는 user와 다를 경우
         if(!wishList.getUser().getId().equals(user.getId())) {
@@ -53,7 +66,7 @@ public class WishListServiceImpl implements WishListService {
     @Override
     public Page<WishListResponseDto> getWishlist(User user, Long wishlistId, int page, int size, String sortBy, boolean isAsc) {
 
-        WishList wishlist=findWishlist(wishlistId);
+        WishList wishlist=wishlistRepository.findById(wishlistId).orElseThrow(()->new NotfoundResourceException(ErrorCode.NOTFOUND_WISHLIST));
 
         //wishList의 주인장(?)이 현재 접근하려는 user와 다를 경우
         if(!wishlist.getUser().getId().equals(user.getId())) {
@@ -92,9 +105,10 @@ public class WishListServiceImpl implements WishListService {
 
 
     //위시리스트를 찾는 메소드
-    private WishList findWishlist(Long wishlistId) {
-        return wishlistRepository.findById(wishlistId).orElseThrow(()-> new NotfoundResourceException(ErrorCode.NOTFOUND_WISHLIST));
+    private WishList findWishlist(Long wishListId) {
+        return wishlistRepository.findById(wishListId).orElseThrow(()-> new NotfoundResourceException(ErrorCode.NOTFOUND_WISHLIST));
     }
+
     //위시리스트 아이템을 찾는 메소드
     private WishListItem findWishlistItem(Long wishListItemId) {
 
