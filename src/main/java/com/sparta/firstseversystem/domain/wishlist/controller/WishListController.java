@@ -30,6 +30,7 @@ public class WishListController {
         return ApiResponse.ok(HttpStatus.OK.value(), "위시리스트에 상품이 추가되었습니다.");
     }
 
+
     /** wishlist의 상품 목록을 조회하는 메소드 **/
     @GetMapping("/wishlists")
     public ApiResponse<Page<WishListResponseDto>> getWishlist(@AuthenticationPrincipal CustomUserDetails customUserDetails,
@@ -44,6 +45,7 @@ public class WishListController {
 
     }
 
+
     /**wishlist의 item의 정보를 상세 조회하는 메소드**/
     @GetMapping("/wishlist/{wishListItemId}")
     public ApiResponse<ProductResponseDto> getWishListItem(@AuthenticationPrincipal CustomUserDetails customUserDetails,
@@ -51,6 +53,7 @@ public class WishListController {
         ProductResponseDto productResponseDto= wishlistService.getWishlistItem(customUserDetails.getUser(),wishListItemId);
         return ApiResponse.ok(HttpStatus.OK.value(), "위시리스트 상품 상세 조회에 성공하셨습니다.",productResponseDto);
     }
+
 
     /**wishlist 수량 수정 메소드**/
     @PutMapping("/wishlist/{wishListItemId}")
@@ -60,6 +63,7 @@ public class WishListController {
         wishlistService.updateWishListItemQuantity(customUserDetails.getUser(),wishListItemId,wishListUpdateRequestDto);
         return ApiResponse.ok(HttpStatus.OK.value(), "상품의 수량이 변경되었습니다.");
     }
+
 
     /**wishlist 삭제 메소드**/
     @DeleteMapping("/wishlist/{wishListItemId}")

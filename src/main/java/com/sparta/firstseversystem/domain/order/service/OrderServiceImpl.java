@@ -50,30 +50,16 @@ public class OrderServiceImpl implements OrderService {
         Product product=getProductById(orderRequestDto.getProductId());
 
         /**주문 생성**/
-        Order order=Order.builder().
-                user(user).
-                totalPrice(product.getPrice() * orderRequestDto.getQuantity()).
-                orderer(user.getUsername()).
-                orderStatus(OrderStatus.ORDER_START).
-                build();
+        Order order=Order.of(user,product,orderRequestDto);
         orderRepository.save(order);
 
         /**주문 아이템 생성**/
-        OrderItem orderItem=OrderItem.builder().
-                order(order).
-                product(product).
-                quantity(orderRequestDto.getQuantity()).
-                build();
+        OrderItem orderItem=OrderItem.of(order,product,orderRequestDto);
         orderItemRepository.save(orderItem);
 
 
         /**배송 정보 생성**/
-        Delivery delivery=Delivery.builder().
-                order(order).
-                address(orderRequestDto.getAddress()).
-                phoneNumber(orderRequestDto.getPhoneNumber()).
-                deliveryStatus(DeliveryStatus.READY_DELIVERY).
-                build();
+        Delivery delivery=Delivery.of(order,orderRequestDto);
         deliveryRepository.save(delivery);
 
         //주문 후 수량 변경 : 현재 수량 - orderRequestDto.getQuantity()
@@ -125,8 +111,9 @@ public class OrderServiceImpl implements OrderService {
         if(LocalDateTime.now().isAfter(order.getDelivery().getCompletedAt().plusDays(2))){
             throw new InvalidReturnException(ErrorCode.CANNOT_BE_RETURN);
         }
-        order.setOrderStatus(OrderStatus.SIGN_RETURN);
-        order.setReturnSignedAt(LocalDateTime.now());
+
+        //반품 신청
+        order.signedReturn(order);
         orderRepository.save(order);
 
     }

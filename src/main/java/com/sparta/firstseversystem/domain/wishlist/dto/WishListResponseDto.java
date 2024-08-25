@@ -1,6 +1,5 @@
 package com.sparta.firstseversystem.domain.wishlist.dto;
 
-import com.sparta.firstseversystem.domain.wishlist.entity.WishList;
 import com.sparta.firstseversystem.domain.wishlist.entity.WishListItem;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,7 +16,7 @@ public class WishListResponseDto {
     private int quantity;
     private Long price;
 
-    public static WishListResponseDto of(WishListItem wishListItem) {
+    public static WishListResponseDto from(WishListItem wishListItem) {
         return WishListResponseDto.builder().
                 wishlistId(wishListItem.getId()).
                 productName(wishListItem.getProduct().getProductName()).
