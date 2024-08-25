@@ -44,9 +44,10 @@ public class OrderServiceImpl implements OrderService {
     private final DeliveryRepository deliveryRepository;
 
     @Override
+    @Transactional
     public void createOrder(User user, OrderRequestDto orderRequestDto) {
 
-        Product product=productRepository.findById(orderRequestDto.getProductId()).orElseThrow(()-> new NotfoundResourceException(ErrorCode.NOTFOUND_PRODUCT));
+        Product product=getProductById(orderRequestDto.getProductId());
 
         /**주문 생성**/
         Order order=Order.builder().
@@ -99,7 +100,7 @@ public class OrderServiceImpl implements OrderService {
     public void deleteOrder(User user, Long orderId) {
         Order order=getOrderById(orderId);
 
-        validateOrder(order); //주문 가능 여부 확인
+        validateOrder(order); //주문 취소 가능 여부 확인
         order.setOrderStatus(OrderStatus.ORDER_CANCEL);
 
         //주문 상품들에 대한 재고 복구
@@ -131,11 +132,18 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
+    //주문 가져오는 메소드
     public Order getOrderById(Long orderId) {
         return orderRepository.findById(orderId).orElseThrow(()->new NotfoundResourceException(ErrorCode.NOTFOUND_ORDER));
     }
 
-    /**주문 가능한지 확인하는 메소드**/
+    //상품 가져오는 메소드
+    public Product getProductById(Long productId) {
+        return productRepository.findById(productId).orElseThrow(()-> new NotfoundResourceException(ErrorCode.NOTFOUND_PRODUCT));
+
+    }
+
+    //주문 가능한지 확인하는 메소드
     public void validateOrder(Order order) {
 
         OrderStatus orderStatus=order.getOrderStatus();
