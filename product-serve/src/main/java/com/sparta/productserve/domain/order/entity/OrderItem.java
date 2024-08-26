@@ -42,7 +42,7 @@ public class OrderItem extends TimeStamped {
         return OrderItem.builder().
                 order(order).
                 product(product).
-                quantity(orderItemRequestDto.getOrderItemQuantity()).
+                quantity(orderItemRequestDto.getQuantity()).
                 build();
     }
 

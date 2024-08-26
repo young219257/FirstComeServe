@@ -1,6 +1,5 @@
 package com.sparta.productserve.global.exception.handler;
 
-import com.sparta.orderserve.global.exception.*;
 import com.sparta.productserve.global.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
