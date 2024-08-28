@@ -1,8 +1,6 @@
 package com.sparta.productserve.domain.wishlist.entity;
 
 
-import com.sparta.productserve.domain.user.entity.User;
-import com.sparta.productserve.global.entity.TimeStamped;
 import com.sparta.productserve.global.entity.TimeStamped;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -24,9 +22,12 @@ public class WishList extends TimeStamped {
     private Long id;
 
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="user_id",nullable = false)
-    private User user;
+//    @OneToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name="user_id",nullable = false)
+//    private User user;
+
+    @Column(nullable = false)
+    private Long userId;
 
     @OneToMany(mappedBy = "wishList",cascade = CascadeType.REMOVE)
     private List<WishListItem> wishListItems;

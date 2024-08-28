@@ -1,18 +1,11 @@
 package com.sparta.userserve.domain.user.entity;
 
-import com.sparta.userserve.domain.order.entity.Order;
 import com.sparta.userserve.domain.user.dto.SignupDto;
-import com.sparta.userserve.domain.wishlist.entity.WishList;
 import com.sparta.userserve.global.security.utils.EncryptionUtils;
-import com.sparta.userserve.domain.order.entity.Order;
-import com.sparta.userserve.domain.wishlist.entity.WishList;
-import com.sparta.userserve.global.security.utils.EncryptionUtils;
-import com.sparta.userserve.domain.order.entity.Order;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.util.List;
 
 
 @Entity
@@ -45,11 +38,11 @@ public class User {
     @Column(nullable = false)
     private boolean emailVerified;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
-    private List<Order> orders;
+//    Instead @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+//    private List<Order> orders;
 
-    @OneToOne(mappedBy = "user",cascade = CascadeType.REMOVE)
-    private WishList wishList;
+//    @OneToOne(mappedBy = "user",cascade = CascadeType.REMOVE)
+//    private WishList wishList;
 
 
     public static User of(SignupDto requestDto, BCryptPasswordEncoder encoder){

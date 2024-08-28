@@ -63,6 +63,13 @@ public class JwtUtils {
         return null;
     }
 
+    public Long getExpiryTime(String token) {
+        Claims claims=Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody();
+
+        Date expiration = claims.getExpiration();
+        return expiration.getTime();
+    }
+
     // 토큰 검증
     public boolean validateToken(String token) {
         try {

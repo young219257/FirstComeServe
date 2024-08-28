@@ -7,12 +7,6 @@ import com.sparta.productserve.domain.product.entity.Product;
 import com.sparta.productserve.domain.product.repository.ProductRepository;
 import com.sparta.productserve.global.exception.ErrorCode;
 import com.sparta.productserve.global.exception.NotfoundResourceException;
-import com.sparta.productserve.domain.product.dto.ProductListResponseDto;
-import com.sparta.productserve.domain.product.dto.ProductResponseDto;
-import com.sparta.productserve.domain.product.entity.Product;
-import com.sparta.productserve.domain.product.repository.ProductRepository;
-import com.sparta.productserve.global.exception.ErrorCode;
-import com.sparta.productserve.global.exception.NotfoundResourceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -41,7 +35,6 @@ public class ProductServiceImpl implements ProductService {
 
         Product product = productRepository.findById(productId).orElseThrow(()->new NotfoundResourceException(ErrorCode.NOTFOUND_PRODUCT));
 
-        ProductResponseDto productResponseDto = ProductResponseDto.of(product);
-        return productResponseDto;
+        return ProductResponseDto.of(product);
     }
 }

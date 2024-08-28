@@ -51,18 +51,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(restApiException, HttpStatus.UNAUTHORIZED);
     }
 
-    @ExceptionHandler(InvalidOrderStatusException.class)
-    public ResponseEntity InvalidOrderStatusException(InvalidOrderStatusException ex) {
-        RestApiException restApiException = new RestApiException(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
-        return new ResponseEntity<>(restApiException, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(InvalidReturnException.class)
-    public ResponseEntity InvalidReturnException(InvalidReturnException ex) {
-        RestApiException restApiException = new RestApiException(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
-        return new ResponseEntity<>(restApiException, HttpStatus.BAD_REQUEST);
-    }
-
     @ExceptionHandler(InvalidPasswordException.class)
     public ResponseEntity InvalidPasswordException(InvalidPasswordException ex) {
         RestApiException restApiException = new RestApiException(HttpStatus.BAD_REQUEST.value(), ex.getMessage());

@@ -43,11 +43,12 @@ public class JwtUtils {
     }
 
     // 토큰 생성
-    public String createAccessToken(String email) {
+    public String createAccessToken(String email,Long userId) {
         Date date = new Date();
 
         return Jwts.builder()
                 .setSubject(email) // 사용자 식별자값(ID)
+                .claim("userId", userId)
                 .setExpiration(new Date(date.getTime() + TOKEN_TIME)) // 만료 시간
                 .setIssuedAt(date) // 발급일
                 .signWith(key, signatureAlgorithm) // 암호화 알고리즘
@@ -61,6 +62,12 @@ public class JwtUtils {
             return bearerToken;
         }
         return null;
+    }
+
+    //header에서 (token)에서 userId가져오기
+    public Long getUserIdFromJwt(String token) {
+        Claims claims=getUserInfoFromToken(token);
+        return claims.get("userId", Long.class);
     }
 
     // 토큰 검증

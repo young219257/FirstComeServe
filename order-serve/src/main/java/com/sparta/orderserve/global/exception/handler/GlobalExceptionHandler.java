@@ -19,18 +19,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(restApiException, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(DuplicateResourceException.class)
-    public ResponseEntity DuplicateResourceException(DuplicateResourceException ex) {
-        RestApiException restApiException = new RestApiException(HttpStatus.CONFLICT.value(), ex.getMessage());
-        return new ResponseEntity<>(restApiException, HttpStatus.CONFLICT);
-    }
-
-    @ExceptionHandler(InvalidateTokenException.class)
-    public ResponseEntity InvalidateTokenException(InvalidateTokenException ex) {
-        RestApiException restApiException = new RestApiException(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
-        return new ResponseEntity<>(restApiException, HttpStatus.BAD_REQUEST);
-
-    }
 
     @ExceptionHandler(NotfoundResourceException.class)
     public ResponseEntity NotFoundResourceException(NotfoundResourceException ex) {
@@ -63,9 +51,4 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(restApiException, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(InvalidPasswordException.class)
-    public ResponseEntity InvalidPasswordException(InvalidPasswordException ex) {
-        RestApiException restApiException = new RestApiException(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
-        return new ResponseEntity<>(restApiException, HttpStatus.BAD_REQUEST);
-    }
 }

@@ -14,6 +14,7 @@ import com.sparta.userserve.global.security.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -31,7 +32,7 @@ public class SecurityConfig {
 
     private final JwtUtils jwtUtils;
     private final CustomUserDetailsService userDetailsService;
-
+    private final RedisTemplate<String, String> redisTemplate;
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -70,6 +71,6 @@ public class SecurityConfig {
     }
     @Bean
     public JwtAuthorizationFilter jwtAuthorizationFilter() throws Exception {
-        return new JwtAuthorizationFilter(jwtUtils, userDetailsService);
+        return new JwtAuthorizationFilter(jwtUtils, userDetailsService,redisTemplate);
     }
 }

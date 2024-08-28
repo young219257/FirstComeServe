@@ -2,14 +2,13 @@ package com.sparta.userserve.global.security.filter;
 
 import com.sparta.userserve.global.security.service.CustomUserDetailsService;
 import com.sparta.userserve.global.security.utils.JwtUtils;
-import com.sparta.userserve.global.security.service.CustomUserDetailsService;
-import com.sparta.userserve.global.security.utils.JwtUtils;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -25,10 +24,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final JwtUtils jwtUtils;
     private final CustomUserDetailsService customUserDetailsService;
-
-    public JwtAuthorizationFilter(JwtUtils jwtUtils, CustomUserDetailsService customUserDetailsService) {
+    private RedisTemplate<String, String> redisTemplate;
+    public JwtAuthorizationFilter(JwtUtils jwtUtils, CustomUserDetailsService customUserDetailsService, RedisTemplate<String, String> redisTemplate) {
         this.jwtUtils = jwtUtils;
         this.customUserDetailsService = customUserDetailsService;
+        this.redisTemplate = redisTemplate;
     }
 
     @Override
@@ -38,10 +38,17 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         String authorization = jwtUtils.getJwtFromHeader(request);
         log.info("Authorization 헤더: {}", authorization);
 
+
         if (authorization != null && authorization.startsWith("Bearer ")) {
             String token = authorization.substring(7);
             log.info(token);
 
+            if(token != null && redisTemplate.hasKey(token)) {
+                //블랙리스트 있으면 요청 거부
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+
+            }
             if(!jwtUtils.validateToken(token)) {
                 log.error("Token error");
                 filterChain.doFilter(request, response);

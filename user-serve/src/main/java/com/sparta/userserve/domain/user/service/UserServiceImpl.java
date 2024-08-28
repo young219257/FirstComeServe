@@ -4,31 +4,20 @@ import com.sparta.userserve.domain.user.dto.PasswordUpdateRequestDto;
 import com.sparta.userserve.domain.user.dto.SignupDto;
 import com.sparta.userserve.domain.user.entity.User;
 import com.sparta.userserve.domain.user.repository.UserRepository;
-import com.sparta.userserve.domain.wishlist.entity.WishList;
-import com.sparta.userserve.domain.wishlist.repository.WishListRepository;
 import com.sparta.userserve.global.exception.DuplicateResourceException;
 import com.sparta.userserve.global.exception.ErrorCode;
 import com.sparta.userserve.global.exception.InvalidPasswordException;
 import com.sparta.userserve.global.exception.NotfoundResourceException;
 import com.sparta.userserve.global.security.utils.EncryptionUtils;
 import com.sparta.userserve.global.security.utils.JwtUtils;
-import com.sparta.userserve.domain.wishlist.entity.WishList;
-import com.sparta.userserve.domain.wishlist.repository.WishListRepository;
-import com.sparta.userserve.global.exception.DuplicateResourceException;
-import com.sparta.userserve.global.exception.ErrorCode;
-import com.sparta.userserve.global.exception.InvalidPasswordException;
-import com.sparta.userserve.global.exception.NotfoundResourceException;
-import com.sparta.userserve.global.security.utils.EncryptionUtils;
-import com.sparta.userserve.global.security.utils.JwtUtils;
-import com.sparta.userserve.domain.user.dto.PasswordUpdateRequestDto;
-import com.sparta.userserve.domain.user.entity.User;
-import com.sparta.userserve.domain.user.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.time.Duration;
 import java.util.Optional;
 
 
@@ -42,7 +31,6 @@ public class UserServiceImpl implements UserService {
     private final BCryptPasswordEncoder encoder;
     private final EmailService emailService;
     private final RedisTemplate<String, String> redisTemplate;
-    private final WishListRepository wishlistRepository;
     private final JwtUtils jwtUtils;
 
 
@@ -57,12 +45,6 @@ public class UserServiceImpl implements UserService {
 
         User user = User.of(requestDto,encoder);
         userRepository.save(user);
-
-        //wishlist 생성
-        WishList wishlist = WishList.builder()
-                .user(user)
-                .build();
-        wishlistRepository.save(wishlist);
 
         //이메일 인증을 위한 이메일 전송
         emailService.sendEmail(EncryptionUtils.decrypt(user.getEmail()));
@@ -97,13 +79,16 @@ public class UserServiceImpl implements UserService {
         return false;
     }
 
-//    @Override
-//    @Transactional
-//    public void logout(User user, HttpServletRequest request) {
-//
-//        String token = jwtUtils.getJwtFromHeader(request).substring(7);
-//        accessTokenBlackListService.addToBlackList(token,TOKEN_TTL);
-//    }
+    @Override
+    @Transactional
+    public void logout(User user, HttpServletRequest request) {
+
+        String token = jwtUtils.getJwtFromHeader(request).substring(7);
+        Long expiration= jwtUtils.getExpiryTime(token);
+        Long remainTime = expiration - System.currentTimeMillis();
+
+        redisTemplate.opsForValue().set(token,"logout",Duration.ofMillis(remainTime));
+    }
 
     @Override
     @Transactional

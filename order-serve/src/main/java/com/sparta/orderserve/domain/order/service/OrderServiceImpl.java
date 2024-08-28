@@ -10,9 +10,6 @@ import com.sparta.orderserve.domain.order.entity.OrderItem;
 import com.sparta.orderserve.domain.order.repository.OrderItemRepository;
 import com.sparta.orderserve.domain.order.repository.OrderRepository;
 import com.sparta.orderserve.domain.order.type.OrderStatus;
-import com.sparta.orderserve.domain.product.entity.Product;
-import com.sparta.orderserve.domain.product.repository.ProductRepository;
-import com.sparta.orderserve.domain.user.entity.User;
 import com.sparta.orderserve.global.exception.ErrorCode;
 import com.sparta.orderserve.global.exception.InvalidOrderStatusException;
 import com.sparta.orderserve.global.exception.InvalidReturnException;
@@ -28,7 +25,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,68 +33,67 @@ import java.util.stream.Collectors;
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
-    private final ProductRepository productRepository;
     private final DeliveryRepository deliveryRepository;
 
     @Override
     @Transactional
-    public void createOrder(User user, OrderRequestDto orderRequestDto) {
+    public void createOrder(Long userId, OrderRequestDto orderRequestDto) {
 
 
-        // 제품 정보 Map 생성
-        Map<Long, Product> productMap = orderRequestDto.getOrderItems().stream()
-                .collect(Collectors.toMap(OrderItemRequestDto::getProductId, item -> getProductById(item.getProductId())));
-
-
-        /**주문 생성**/
-        Order order=Order.of(user,productMap,orderRequestDto);
-        orderRepository.save(order);
-
-        /**주문 아이템 생성**/
-        for(OrderItemRequestDto itemRequestDto:orderRequestDto.getOrderItems()){
-            Product product=getProductById(itemRequestDto.getProductId());
-
-            OrderItem orderItem=OrderItem.of(order,product,itemRequestDto);
-            orderItemRepository.save(orderItem);
-
-            //주문 수량 변경 : 현재 수량 - orderRequestDto.getQuantity()
-            product.setStockQuantity(product.getStockQuantity()-orderItem.getQuantity());
-            productRepository.save(product);
-        }
-
-        /**배송 정보 생성**/
-        Delivery delivery=Delivery.of(order,orderRequestDto);
-        deliveryRepository.save(delivery);
+//        // 제품 정보 Map 생성
+//        Map<Long, Product> productMap = orderRequestDto.getOrderItems().stream()
+//                .collect(Collectors.toMap(OrderItemRequestDto::getProductId, item -> getProductById(item.getProductId())));
+//
+//        /**주문 생성**/
+//        Order order=Order.of(userId,productMap,orderRequestDto);
+//        orderRepository.save(order);
+//
+//        /**주문 아이템 생성**/
+//        for(OrderItemRequestDto itemRequestDto:orderRequestDto.getOrderItems()){
+//            Product product=getProductById(itemRequestDto.getProductId());
+//
+//            OrderItem orderItem=OrderItem.of(order,product,itemRequestDto);
+//            orderItemRepository.save(orderItem);
+//
+//            //주문 수량 변경 : 현재 수량 - orderRequestDto.getQuantity()
+//            product.setStockQuantity(product.getStockQuantity()-orderItem.getQuantity());
+//            productRepository.save(product);
+//        }
+//
+//
+//        /**배송 정보 생성**/
+//        Delivery delivery=Delivery.of(order,orderRequestDto);
+//        deliveryRepository.save(delivery);
 
     }
 
     @Override
     @Transactional
-    public Page<OrderResponseDto> getAllOrders(User user, int page, int size, String sortBy, boolean isAsc) {
+    public Page<OrderResponseDto> getAllOrders(Long userId, int page, int size, String sortBy, boolean isAsc) {
         // 정렬 방향 설정
         Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
         //페이징 처리와 정렬 정보를 포함하는 객체
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
 
-        Page<Order> orders=orderRepository.findAllByUser(user,pageable);
+        Page<Order> orders=orderRepository.findAllByUserId(userId,pageable);
 
         return orders.map(OrderResponseDto::from);
     }
 
     @Override
     @Transactional
-    public void deleteOrder(User user, Long orderId) {
+    public void deleteOrder(Long userId, Long orderId) {
         Order order=getOrderById(orderId);
 
         validateOrder(order); //주문 취소 가능 여부 확인
         order.setOrderStatus(OrderStatus.ORDER_CANCEL);
 
-        //주문 상품들에 대한 재고 복구
-        List<OrderItem> orderItems= order.getOrderItems();
-        for(OrderItem orderItem:orderItems){
-            orderItem.getProduct().setStockQuantity(orderItem.getProduct().getStockQuantity() - orderItem.getQuantity());
-            orderItemRepository.save(orderItem);
-        }
+//        //주문 상품들에 대한 재고 복구
+//        List<OrderItem> orderItems= order.getOrderItems();
+//        for(OrderItem orderItem:orderItems){
+//            orderItem.getProduct().setStockQuantity(orderItem.getProduct().getStockQuantity() - orderItem.getQuantity());
+//            orderItemRepository.save(orderItem);
+//        }
 
     }
 
@@ -108,7 +103,7 @@ public class OrderServiceImpl implements OrderService {
      * **/
     @Override
     @Transactional
-    public void returnOrder(User user, Long orderId) {
+    public void returnOrder(Long userId, Long orderId) {
 
         Order order=getOrderById(orderId);
         //배송 완료일로부터 +1 인 경우
@@ -128,11 +123,12 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.findById(orderId).orElseThrow(()->new NotfoundResourceException(ErrorCode.NOTFOUND_ORDER));
     }
 
-    //상품 가져오는 메소드
-    public Product getProductById(Long productId) {
-        return productRepository.findById(productId).orElseThrow(()-> new NotfoundResourceException(ErrorCode.NOTFOUND_PRODUCT));
-
-    }
+//
+//    //상품 가져오는 메소드
+//    public Product getProductById(Long productId) {
+//        return productRepository.findById(productId).orElseThrow(()-> new NotfoundResourceException(ErrorCode.NOTFOUND_PRODUCT));
+//
+//    }
 
     //주문 가능한지 확인하는 메소드
     public void validateOrder(Order order) {

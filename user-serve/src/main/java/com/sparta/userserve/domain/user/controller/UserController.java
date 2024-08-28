@@ -11,6 +11,7 @@ import com.sparta.userserve.global.exception.ErrorCode;
 import com.sparta.userserve.global.exception.InvalidateTokenException;
 import com.sparta.userserve.global.exception.handler.dto.ApiResponse;
 import com.sparta.userserve.global.security.service.CustomUserDetails;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -44,15 +45,15 @@ public class UserController {
     }
 
 
-//    /**로그아웃 api
-//     @Param : userId
-//     @return : 성공 여부
-//     **/
-//    @PostMapping("/logout")
-//    public ApiResponse logout(@AuthenticationPrincipal CustomUserDetails userDetails, HttpServletRequest request) {
-//        userService.logout(userDetails.getUser(),request);
-//        return ApiResponse.ok(200,"로그아웃에 성공하셨습니다.");
-//    }
+    /**로그아웃 api
+     @Param : userId
+     @return : 성공 여부
+     **/
+    @PostMapping("/logout")
+    public ApiResponse logout(@AuthenticationPrincipal CustomUserDetails userDetails, HttpServletRequest request) {
+        userService.logout(userDetails.getUser(),request);
+        return ApiResponse.ok(200,"로그아웃에 성공하셨습니다.");
+    }
 
 
     /**회원 수정 api

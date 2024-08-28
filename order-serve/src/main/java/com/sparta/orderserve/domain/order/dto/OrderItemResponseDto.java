@@ -22,8 +22,8 @@ public class OrderItemResponseDto {
 
     public static OrderItemResponseDto from(OrderItem orderItem) {
         return OrderItemResponseDto.builder()
-                .orderItemName(orderItem.getProduct().getProductName())
-                .orderItemPrice(orderItem.getProduct().getPrice())
+//                .orderItemName(orderItem.getProduct().getProductName())
+//                .orderItemPrice(orderItem.getProduct().getPrice())
                 .orderItemQuantity(orderItem.getQuantity())
                 .orderStatus(orderItem.getOrder().getOrderStatus())
                 .deliveryStatus(orderItem.getOrder().getDelivery().getDeliveryStatus())
