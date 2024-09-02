@@ -1,11 +1,12 @@
 package com.sparta.orderserve.domain.delivery.scheduler;
 
 import com.sparta.orderserve.domain.delivery.type.DeliveryStatus;
+import com.sparta.orderserve.domain.order.client.OrderClient;
+import com.sparta.orderserve.domain.order.dto.ProductDto;
 import com.sparta.orderserve.domain.order.entity.Order;
 import com.sparta.orderserve.domain.order.entity.OrderItem;
 import com.sparta.orderserve.domain.order.repository.OrderRepository;
 import com.sparta.orderserve.domain.order.type.OrderStatus;
-import com.sparta.orderserve.domain.product.entity.Product;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -20,6 +21,7 @@ import java.util.List;
 public class DeliveryScheduler {
 
     private final OrderRepository orderRepository;
+    private final OrderClient orderClient;
 
     @Scheduled(cron = "0 0 12,18 * * *") // 매일 12시, 18시
     public void updateDelivery() {
@@ -73,7 +75,12 @@ public class DeliveryScheduler {
     }
 
     private void updateProductStock(OrderItem orderItem) {
-        Product product = orderItem.getProduct();
-        product.setStockQuantity(product.getStockQuantity() + orderItem.getQuantity()); // 재고 복구
+
+        ProductDto productDto= orderClient.getProductById(orderItem.getProductId()).block();
+
+        //재고 복구
+        int newStock=productDto.getProductQuantity()+orderItem.getQuantity();
+
+        orderClient.updateProductStock(productDto,newStock);
     }
 }

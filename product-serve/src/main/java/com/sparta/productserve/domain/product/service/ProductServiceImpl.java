@@ -3,10 +3,12 @@ package com.sparta.productserve.domain.product.service;
 
 import com.sparta.productserve.domain.product.dto.ProductListResponseDto;
 import com.sparta.productserve.domain.product.dto.ProductResponseDto;
+import com.sparta.productserve.domain.product.dto.ProductStockUpdateDto;
 import com.sparta.productserve.domain.product.entity.Product;
 import com.sparta.productserve.domain.product.repository.ProductRepository;
 import com.sparta.productserve.global.exception.ErrorCode;
 import com.sparta.productserve.global.exception.NotfoundResourceException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,8 +35,21 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponseDto getProduct(Long productId) {
 
-        Product product = productRepository.findById(productId).orElseThrow(()->new NotfoundResourceException(ErrorCode.NOTFOUND_PRODUCT));
+        Product product=findProductById(productId);
 
         return ProductResponseDto.of(product);
+    }
+
+    @Override
+    @Transactional
+    public void updateProductStock(Long productId, ProductStockUpdateDto productStockUpdateDto) {
+
+        Product product=findProductById(productId);
+        product.setStockQuantity(productStockUpdateDto.getQuantity());
+    }
+
+    private Product findProductById(Long productId) {
+        return productRepository.findById(productId).orElseThrow(()->new NotfoundResourceException(ErrorCode.NOTFOUND_PRODUCT));
+
     }
 }

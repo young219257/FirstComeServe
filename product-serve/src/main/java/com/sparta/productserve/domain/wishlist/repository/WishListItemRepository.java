@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface WishListItemRepository  extends JpaRepository<WishListItem, Long> {
-    Page<WishListItem> findALlByWishListId(Long wishlistId,Pageable pageable);
+    Page<WishListItem> findAllByWishListId(Long wishlistId,Pageable pageable);
 }

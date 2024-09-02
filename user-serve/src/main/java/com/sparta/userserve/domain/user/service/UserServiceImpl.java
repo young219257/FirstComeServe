@@ -2,6 +2,7 @@ package com.sparta.userserve.domain.user.service;
 
 import com.sparta.userserve.domain.user.dto.PasswordUpdateRequestDto;
 import com.sparta.userserve.domain.user.dto.SignupDto;
+import com.sparta.userserve.domain.user.dto.UserResponseDto;
 import com.sparta.userserve.domain.user.entity.User;
 import com.sparta.userserve.domain.user.repository.UserRepository;
 import com.sparta.userserve.global.exception.DuplicateResourceException;
@@ -14,8 +15,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.util.Optional;
@@ -32,7 +36,7 @@ public class UserServiceImpl implements UserService {
     private final EmailService emailService;
     private final RedisTemplate<String, String> redisTemplate;
     private final JwtUtils jwtUtils;
-
+    private final WebClient webClient;
 
 
     //회원가입
@@ -103,6 +107,16 @@ public class UserServiceImpl implements UserService {
 
     }
 
+
+    @Override
+    public UserResponseDto getUser(Long userId) {
+        User user=findUserById(userId);
+        return UserResponseDto.from(user);
+    }
+
+    private User findUserById(Long userId) {
+        return userRepository.findById(userId).orElseThrow(()->new NotfoundResourceException(ErrorCode.NOTFOUND_USER));
+    }
 
     private User findUserByEmail(String email) {
         return userRepository.findByEmail(EncryptionUtils.encrypt(email)).orElseThrow(()->new NotfoundResourceException(ErrorCode.NOTFOUND_USER));

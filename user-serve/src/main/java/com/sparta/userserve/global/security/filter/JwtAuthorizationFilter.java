@@ -13,6 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -56,8 +57,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             }
 
             Claims info = jwtUtils.getUserInfoFromToken(token);
+
             try {
                 setAuthentication(info.getSubject());
+                Long userId=jwtUtils.getUserIdFromJwt(token);
+                response.setHeader("userId", String.valueOf(userId));
             } catch (Exception e) {
                 log.error(e.getMessage());
                 return;

@@ -70,6 +70,12 @@ public class JwtUtils {
         return expiration.getTime();
     }
 
+    //header에서 (token)에서 userId가져오기
+    public Long getUserIdFromJwt(String token) {
+        Claims claims=getUserInfoFromToken(token);
+        return claims.get("userId", Long.class);
+    }
+
     // 토큰 검증
     public boolean validateToken(String token) {
         try {

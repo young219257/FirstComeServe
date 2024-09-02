@@ -1,4 +1,4 @@
-package com.sparta.productserve.global.security.utils;
+package com.sparta.productserve.global.utils;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;

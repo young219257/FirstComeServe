@@ -57,12 +57,13 @@ public class WishListServiceImpl implements WishListService {
     @Transactional
     public Page<WishListResponseDto> getWishlist(Long userId, int page, int size, String sortBy, boolean isAsc) {
 
+        WishList wishList=findWishlist(userId);
 
         // 정렬 방향 설정
         Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
 
-        Page<WishListItem> wishlists = wishListItemRepository.findALlByWishListId(userId,pageable);
+        Page<WishListItem> wishlists = wishListItemRepository.findAllByWishListId(wishList.getId(),pageable);
         return wishlists.map(WishListResponseDto::from);
     }
 
@@ -89,6 +90,7 @@ public class WishListServiceImpl implements WishListService {
     public void deleteWishListItem(Long userId, Long wishListItemId) {
         wishListItemRepository.delete(findWishlistItem(wishListItemId));
     }
+
 
     //상품 찾는 메소드
     private Product findProduct(Long productId) {

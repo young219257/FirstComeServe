@@ -2,9 +2,8 @@ package com.sparta.orderserve.domain.order.service;
 
 import com.sparta.orderserve.domain.delivery.entity.Delivery;
 import com.sparta.orderserve.domain.delivery.repository.DeliveryRepository;
-import com.sparta.orderserve.domain.order.dto.OrderItemRequestDto;
-import com.sparta.orderserve.domain.order.dto.OrderRequestDto;
-import com.sparta.orderserve.domain.order.dto.OrderResponseDto;
+import com.sparta.orderserve.domain.order.client.OrderClient;
+import com.sparta.orderserve.domain.order.dto.*;
 import com.sparta.orderserve.domain.order.entity.Order;
 import com.sparta.orderserve.domain.order.entity.OrderItem;
 import com.sparta.orderserve.domain.order.repository.OrderItemRepository;
@@ -22,9 +21,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,36 +36,40 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final DeliveryRepository deliveryRepository;
+    private final OrderClient orderClient;
 
     @Override
     @Transactional
     public void createOrder(Long userId, OrderRequestDto orderRequestDto) {
 
 
-//        // 제품 정보 Map 생성
-//        Map<Long, Product> productMap = orderRequestDto.getOrderItems().stream()
-//                .collect(Collectors.toMap(OrderItemRequestDto::getProductId, item -> getProductById(item.getProductId())));
-//
-//        /**주문 생성**/
-//        Order order=Order.of(userId,productMap,orderRequestDto);
-//        orderRepository.save(order);
-//
-//        /**주문 아이템 생성**/
-//        for(OrderItemRequestDto itemRequestDto:orderRequestDto.getOrderItems()){
-//            Product product=getProductById(itemRequestDto.getProductId());
-//
-//            OrderItem orderItem=OrderItem.of(order,product,itemRequestDto);
-//            orderItemRepository.save(orderItem);
-//
-//            //주문 수량 변경 : 현재 수량 - orderRequestDto.getQuantity()
-//            product.setStockQuantity(product.getStockQuantity()-orderItem.getQuantity());
-//            productRepository.save(product);
-//        }
-//
-//
-//        /**배송 정보 생성**/
-//        Delivery delivery=Delivery.of(order,orderRequestDto);
-//        deliveryRepository.save(delivery);
+        // 제품 정보 Map 생성
+        Map<Long, ProductDto> productMap = orderRequestDto.getOrderItems().stream()
+                .collect(Collectors.toMap(OrderItemRequestDto::getProductId, item -> orderClient.getProductById(item.getProductId()).block()));
+
+
+        UserDto userDto=orderClient.getUserById(userId).block();
+        /**주문 생성**/
+        Order order=Order.of(userDto,productMap,orderRequestDto);
+        orderRepository.save(order);
+
+        /**주문 아이템 생성**/
+        for(OrderItemRequestDto itemRequestDto:orderRequestDto.getOrderItems()){
+            ProductDto product= orderClient.getProductById(itemRequestDto.getProductId()).block();
+
+            OrderItem orderItem=OrderItem.of(order, product.getProductId(), itemRequestDto);
+            orderItemRepository.save(orderItem);
+
+
+            //재고 업데이트 요청
+            int newStockQuantity=product.getProductQuantity()-itemRequestDto.getQuantity();
+            orderClient.updateProductStock(product,newStockQuantity);
+        }
+
+
+        /**배송 정보 생성**/
+        Delivery delivery=Delivery.of(order,orderRequestDto);
+        deliveryRepository.save(delivery);
 
     }
 
@@ -88,12 +94,18 @@ public class OrderServiceImpl implements OrderService {
         validateOrder(order); //주문 취소 가능 여부 확인
         order.setOrderStatus(OrderStatus.ORDER_CANCEL);
 
-//        //주문 상품들에 대한 재고 복구
-//        List<OrderItem> orderItems= order.getOrderItems();
-//        for(OrderItem orderItem:orderItems){
-//            orderItem.getProduct().setStockQuantity(orderItem.getProduct().getStockQuantity() - orderItem.getQuantity());
-//            orderItemRepository.save(orderItem);
-//        }
+        //주문 상품들에 대한 재고 복구
+        List<OrderItem> orderItems= order.getOrderItems();
+        for(OrderItem orderItem:orderItems){
+
+            ProductDto productDto= orderClient.getProductById(orderItem.getProductId()).block();
+
+            int newStockQuantity=productDto.getProductQuantity()+ orderItem.getQuantity();
+
+            orderClient.updateProductStock(productDto,newStockQuantity);
+
+            orderItemRepository.save(orderItem);
+        }
 
     }
 
@@ -123,12 +135,6 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.findById(orderId).orElseThrow(()->new NotfoundResourceException(ErrorCode.NOTFOUND_ORDER));
     }
 
-//
-//    //상품 가져오는 메소드
-//    public Product getProductById(Long productId) {
-//        return productRepository.findById(productId).orElseThrow(()-> new NotfoundResourceException(ErrorCode.NOTFOUND_PRODUCT));
-//
-//    }
 
     //주문 가능한지 확인하는 메소드
     public void validateOrder(Order order) {

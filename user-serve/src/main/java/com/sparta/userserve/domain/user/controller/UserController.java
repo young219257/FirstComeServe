@@ -2,19 +2,19 @@ package com.sparta.userserve.domain.user.controller;
 
 import com.sparta.userserve.domain.user.dto.PasswordUpdateRequestDto;
 import com.sparta.userserve.domain.user.dto.SignupDto;
+import com.sparta.userserve.domain.user.dto.UserResponseDto;
+import com.sparta.userserve.domain.user.entity.User;
 import com.sparta.userserve.domain.user.service.UserService;
 import com.sparta.userserve.global.exception.ErrorCode;
 import com.sparta.userserve.global.exception.InvalidateTokenException;
-import com.sparta.userserve.global.exception.handler.dto.ApiResponse;
-import com.sparta.userserve.global.security.service.CustomUserDetails;
-import com.sparta.userserve.global.exception.ErrorCode;
-import com.sparta.userserve.global.exception.InvalidateTokenException;
+import com.sparta.userserve.global.exception.NotfoundResourceException;
 import com.sparta.userserve.global.exception.handler.dto.ApiResponse;
 import com.sparta.userserve.global.security.service.CustomUserDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api/user")
@@ -68,4 +68,16 @@ public class UserController {
         return ApiResponse.ok(200,"회원정보 수정에 성공하셨습니다.");
     }
 
+
+    //회원 정보 가져오는 메소드
+    @GetMapping("{userId}")
+    public ApiResponse<UserResponseDto> getUser(@PathVariable Long userId) {
+        UserResponseDto userResponseDto = userService.getUser(userId);
+        if(userResponseDto == null){
+            throw new NotfoundResourceException(ErrorCode.NOTFOUND_USER);
+        }
+        else{
+            return ApiResponse.ok(200,"회원 정보 조회에 성공하셨습니다.",userResponseDto);
+        }
+    }
 }
