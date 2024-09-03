@@ -4,13 +4,6 @@ import com.sparta.userserve.global.security.filter.JwtAuthenticationFilter;
 import com.sparta.userserve.global.security.filter.JwtAuthorizationFilter;
 import com.sparta.userserve.global.security.service.CustomUserDetailsService;
 import com.sparta.userserve.global.security.utils.JwtUtils;
-import com.sparta.userserve.global.security.filter.JwtAuthenticationFilter;
-import com.sparta.userserve.global.security.filter.JwtAuthorizationFilter;
-import com.sparta.userserve.global.security.service.CustomUserDetailsService;
-import com.sparta.userserve.global.security.utils.JwtUtils;
-import com.sparta.userserve.global.security.filter.JwtAuthenticationFilter;
-import com.sparta.userserve.global.security.filter.JwtAuthorizationFilter;
-import com.sparta.userserve.global.security.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -50,6 +43,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth // 특정 경로에 대해 인증, 인가 없이 접근이 허용
                         .requestMatchers("/api/user/**").permitAll()
                         .requestMatchers("/api/products/**").permitAll()
+                        .requestMatchers("/api/external/user/**").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
