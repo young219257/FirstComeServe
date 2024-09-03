@@ -36,7 +36,6 @@ public class UserServiceImpl implements UserService {
     private final EmailService emailService;
     private final RedisTemplate<String, String> redisTemplate;
     private final JwtUtils jwtUtils;
-    private final WebClient webClient;
 
 
     //회원가입
