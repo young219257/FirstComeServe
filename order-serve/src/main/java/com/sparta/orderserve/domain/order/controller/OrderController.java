@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 public class OrderController {
 
     private final OrderService orderService;
-    private final JwtUtils jwtUtils;
 
 
     /** 상품 페이지에서 해당 상품 주문하는 메소드 **/

@@ -27,6 +27,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,17 +46,16 @@ public class OrderServiceImpl implements OrderService {
 
         // 제품 정보 Map 생성
         Map<Long, ProductDto> productMap = orderRequestDto.getOrderItems().stream()
-                .collect(Collectors.toMap(OrderItemRequestDto::getProductId, item -> orderClient.getProductById(item.getProductId()).block()));
+                .collect(Collectors.toMap(OrderItemRequestDto::getProductId, item -> Objects.requireNonNull(orderClient.getProductById(item.getProductId()).block()).getData()));
 
-
-        UserDto userDto=orderClient.getUserById(userId).block();
+        UserDto userDto= orderClient.getUserById(userId).block().getData();
         /**주문 생성**/
         Order order=Order.of(userDto,productMap,orderRequestDto);
         orderRepository.save(order);
 
         /**주문 아이템 생성**/
         for(OrderItemRequestDto itemRequestDto:orderRequestDto.getOrderItems()){
-            ProductDto product= orderClient.getProductById(itemRequestDto.getProductId()).block();
+            ProductDto product= orderClient.getProductById(itemRequestDto.getProductId()).block().getData();
 
             OrderItem orderItem=OrderItem.of(order, product.getProductId(), itemRequestDto);
             orderItemRepository.save(orderItem);
@@ -82,8 +82,21 @@ public class OrderServiceImpl implements OrderService {
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
 
         Page<Order> orders=orderRepository.findAllByUserId(userId,pageable);
+        // OrderResponseDto로 매핑
+        return orders.map(order -> {
+            // 각 OrderItem에 대해 ProductDto를 가져옴
+            List<OrderItemResponseDto> orderItemResponseDtos = order.getOrderItems().stream()
+                    .map(orderItem -> {
+                        ProductDto productDto = orderClient.getProductById(orderItem.getProductId()).block().getData();
+                        return OrderItemResponseDto.of(orderItem, productDto);
+                    })
+                    .toList();
 
-        return orders.map(OrderResponseDto::from);
+            return OrderResponseDto.builder()
+                    .orderId(order.getId())
+                    .orderItems(orderItemResponseDtos)
+                    .build();
+        });
     }
 
     @Override
@@ -98,7 +111,7 @@ public class OrderServiceImpl implements OrderService {
         List<OrderItem> orderItems= order.getOrderItems();
         for(OrderItem orderItem:orderItems){
 
-            ProductDto productDto= orderClient.getProductById(orderItem.getProductId()).block();
+            ProductDto productDto= orderClient.getProductById(orderItem.getProductId()).block().getData();
 
             int newStockQuantity=productDto.getProductQuantity()+ orderItem.getQuantity();
 

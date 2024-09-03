@@ -20,10 +20,10 @@ public class OrderItemResponseDto {
     private OrderStatus orderStatus; //주문상태
     private DeliveryStatus deliveryStatus;
 
-    public static OrderItemResponseDto from(OrderItem orderItem) {
+    public static OrderItemResponseDto of(OrderItem orderItem,ProductDto productDto) {
         return OrderItemResponseDto.builder()
-//                .orderItemName(orderItem.getProduct().getProductName())
-//                .orderItemPrice(orderItem.getProduct().getPrice())
+                .orderItemName(productDto.getProductName())
+                .orderItemPrice(productDto.getProductPrice())
                 .orderItemQuantity(orderItem.getQuantity())
                 .orderStatus(orderItem.getOrder().getOrderStatus())
                 .deliveryStatus(orderItem.getOrder().getDelivery().getDeliveryStatus())

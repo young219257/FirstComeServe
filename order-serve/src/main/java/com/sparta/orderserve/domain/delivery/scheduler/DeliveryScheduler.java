@@ -76,7 +76,7 @@ public class DeliveryScheduler {
 
     private void updateProductStock(OrderItem orderItem) {
 
-        ProductDto productDto= orderClient.getProductById(orderItem.getProductId()).block();
+        ProductDto productDto= orderClient.getProductById(orderItem.getProductId()).block().getData();
 
         //재고 복구
         int newStock=productDto.getProductQuantity()+orderItem.getQuantity();
