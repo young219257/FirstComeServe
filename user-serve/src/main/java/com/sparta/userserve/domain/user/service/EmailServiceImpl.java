@@ -35,7 +35,7 @@ public class EmailServiceImpl implements EmailService {
         String toMail = email;
         String title = "이메일 인증 링크";
         String content = "이메일 인증 링크를 클릭하세요: " +
-                "<a href=\"http://localhost:8080/api/users/verify?token=" + token + "\">인증 링크</a>";
+                "<a href=\"http://localhost:8080/api/user/verify?token=" + token + "\">인증 링크</a>";
 
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         try {

@@ -36,7 +36,7 @@ public class WishListServiceImpl implements WishListService {
         Product product=findProduct(wishListRequestDto.getProductId());
 
         //user의 위시리스트
-        WishList wishList=findWishlist(userId);
+        WishList wishList=wishlistRepository.findByUserId(userId);
 
         if(wishList==null){
             //wishlist 생성
