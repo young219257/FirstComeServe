@@ -13,9 +13,9 @@ public interface UserService {
 
     boolean verifyEmail(String token);
 
-    void logout(User user, HttpServletRequest request);
+    void logout(Long userId, HttpServletRequest request);
 
-    void updateUser(User user, PasswordUpdateRequestDto requestDto);
+    void updateUser(Long userId, PasswordUpdateRequestDto requestDto);
 
     UserResponseDto getUser(Long userId);
 }

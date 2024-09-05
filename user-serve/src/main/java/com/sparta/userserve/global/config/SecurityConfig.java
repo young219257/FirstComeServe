@@ -1,7 +1,6 @@
 package com.sparta.userserve.global.config;
 
 import com.sparta.userserve.global.security.filter.JwtAuthenticationFilter;
-import com.sparta.userserve.global.security.filter.JwtAuthorizationFilter;
 import com.sparta.userserve.global.security.service.CustomUserDetailsService;
 import com.sparta.userserve.global.security.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
@@ -41,16 +40,13 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth // 특정 경로에 대해 인증, 인가 없이 접근이 허용
-                        .requestMatchers("/api/user/**").permitAll()
-                        .requestMatchers("/api/products/**").permitAll()
-                        .requestMatchers("/api/external/user/**").permitAll()
-                        .anyRequest().authenticated())
+                        .anyRequest().permitAll())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         // 필터 관리 - JwtAuthenticationFilter를 먼저 실행하고, JwtAuthorizationFilter를 그 뒤에 실행
         http.addFilterBefore(jwtAuthenticationFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class);
-        http.addFilterAfter(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
+
 
         return http.build();
     }
@@ -63,8 +59,5 @@ public class SecurityConfig {
         filter.setAuthenticationManager(authenticationManager);
         return filter;
     }
-    @Bean
-    public JwtAuthorizationFilter jwtAuthorizationFilter() throws Exception {
-        return new JwtAuthorizationFilter(jwtUtils, userDetailsService,redisTemplate);
-    }
+
 }

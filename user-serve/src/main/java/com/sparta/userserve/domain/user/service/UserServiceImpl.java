@@ -84,7 +84,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void logout(User user, HttpServletRequest request) {
+    public void logout(Long userId, HttpServletRequest request) {
 
         String token = jwtUtils.getJwtFromHeader(request).substring(7);
         Long expiration= jwtUtils.getExpiryTime(token);
@@ -95,7 +95,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void updateUser(User user, PasswordUpdateRequestDto requestDto) {
+    public void updateUser(Long userId, PasswordUpdateRequestDto requestDto) {
+
+        User user=findUserById(userId);
         if(!encoder.matches(requestDto.getOldPassword(), user.getPassword())) {
             throw new InvalidPasswordException(ErrorCode.PASSWORD_NOT_MATCH);
         }
