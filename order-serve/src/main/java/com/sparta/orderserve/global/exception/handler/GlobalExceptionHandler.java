@@ -4,8 +4,6 @@ import com.sparta.orderserve.global.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -26,18 +24,18 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(restApiException, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity AccessDeniedException(AccessDeniedException ex) {
-        RestApiException restApiException = new RestApiException(HttpStatus.FORBIDDEN.value(), ex.getMessage());
-        return new ResponseEntity<>(restApiException, HttpStatus.FORBIDDEN);
-
-    }
-
-    @ExceptionHandler(UsernameNotFoundException.class)
-    public ResponseEntity UsernameNotFoundException(UsernameNotFoundException ex) {
-        RestApiException restApiException = new RestApiException(HttpStatus.UNAUTHORIZED.value(), ex.getMessage());
-        return new ResponseEntity<>(restApiException, HttpStatus.UNAUTHORIZED);
-    }
+//    @ExceptionHandler(AccessDeniedException.class)
+//    public ResponseEntity AccessDeniedException(AccessDeniedException ex) {
+//        RestApiException restApiException = new RestApiException(HttpStatus.FORBIDDEN.value(), ex.getMessage());
+//        return new ResponseEntity<>(restApiException, HttpStatus.FORBIDDEN);
+//
+//    }
+//
+//    @ExceptionHandler(UsernameNotFoundException.class)
+//    public ResponseEntity UsernameNotFoundException(UsernameNotFoundException ex) {
+//        RestApiException restApiException = new RestApiException(HttpStatus.UNAUTHORIZED.value(), ex.getMessage());
+//        return new ResponseEntity<>(restApiException, HttpStatus.UNAUTHORIZED);
+//    }
 
     @ExceptionHandler(InvalidOrderStatusException.class)
     public ResponseEntity InvalidOrderStatusException(InvalidOrderStatusException ex) {
