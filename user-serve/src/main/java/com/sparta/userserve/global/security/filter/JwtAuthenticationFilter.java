@@ -2,16 +2,13 @@ package com.sparta.userserve.global.security.filter;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sparta.userserve.domain.user.entity.User;
+import com.sparta.userserve.domain.user.repository.UserRepository;
 import com.sparta.userserve.global.security.service.CustomUserDetails;
 import com.sparta.userserve.global.security.service.CustomUserDetailsService;
 import com.sparta.userserve.global.security.utils.EncryptionUtils;
 import com.sparta.userserve.global.security.utils.JwtUtils;
 
-import com.sparta.userserve.domain.user.dto.LoginRequestDto;
-import com.sparta.userserve.global.security.service.CustomUserDetails;
-import com.sparta.userserve.global.security.service.CustomUserDetailsService;
-import com.sparta.userserve.global.security.utils.EncryptionUtils;
-import com.sparta.userserve.global.security.utils.JwtUtils;
 import com.sparta.userserve.domain.user.dto.LoginRequestDto;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,12 +27,14 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final JwtUtils jwtUtils;
     private final AuthenticationManager authenticationManager;
+    private final CustomUserDetailsService userDetailsService;
 
     public JwtAuthenticationFilter(JwtUtils jwtUtils,
                                    AuthenticationManager authenticationManager,
                                    CustomUserDetailsService customUserDetailsService) {
         this.jwtUtils = jwtUtils;
         this.authenticationManager = authenticationManager;
+        this.userDetailsService = customUserDetailsService;
 
         setFilterProcessesUrl("/api/user/login");
     }
@@ -63,7 +62,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
 
         String email = ((CustomUserDetails) authResult.getPrincipal()).getUsername();
-        String accessToken = jwtUtils.createAccessToken(email);
+        String userId= String.valueOf(((CustomUserDetails) authResult.getPrincipal()).getUser().getId());
+
+        String accessToken = jwtUtils.createAccessToken(email,userId);
 
         // Authorization 헤더에 JWT 토큰 추가
         response.addHeader("Authorization", "Bearer " + accessToken);
