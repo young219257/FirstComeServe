@@ -3,7 +3,6 @@ import com.sparta.orderserve.domain.order.dto.OrderRequestDto;
 import com.sparta.orderserve.domain.order.dto.OrderResponseDto;
 import com.sparta.orderserve.domain.order.service.OrderService;
 import com.sparta.orderserve.global.exception.handler.dto.ApiResponse;
-import com.sparta.orderserve.global.security.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
