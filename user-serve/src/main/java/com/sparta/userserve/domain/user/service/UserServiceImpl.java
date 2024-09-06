@@ -4,6 +4,7 @@ import com.sparta.userserve.domain.user.dto.PasswordUpdateRequestDto;
 import com.sparta.userserve.domain.user.dto.SignupDto;
 import com.sparta.userserve.domain.user.dto.UserResponseDto;
 import com.sparta.userserve.domain.user.entity.User;
+import com.sparta.userserve.domain.user.producer.UserProducer;
 import com.sparta.userserve.domain.user.repository.UserRepository;
 import com.sparta.userserve.global.exception.DuplicateResourceException;
 import com.sparta.userserve.global.exception.ErrorCode;
@@ -14,6 +15,7 @@ import com.sparta.userserve.global.security.utils.JwtUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.apache.kafka.clients.producer.KafkaProducer;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -29,15 +31,12 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private static final long TOKEN_TTL = 3600000L; // 1 hour in milliseconds
-
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder encoder;
     private final EmailService emailService;
     private final RedisTemplate<String, String> redisTemplate;
     private final JwtUtils jwtUtils;
-
-
+    private final UserProducer userProducer;
     //회원가입
     @Override
     @Transactional
@@ -68,13 +67,15 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public boolean verifyEmail(String token) {
         String email = emailService.getEmailByToken(token);
-
         if (email != null) {
             User user = findUserByEmail(email);
             if (user != null) {
                 user.setEmailVerified(true);
                 userRepository.save(user);
                 redisTemplate.delete(token);
+
+                //회원가입 완료 이벤트 발행
+                userProducer.sendSignupCompleteEvent(user.getId());
                 return true;
             }
         }
