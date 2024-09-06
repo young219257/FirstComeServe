@@ -7,6 +7,9 @@ import com.sparta.productserve.domain.wishlist.dto.WishListResponseDto;
 import org.springframework.data.domain.Page;
 
 public interface WishListService {
+
+    void createWishList(Long userId);
+
     void addProductToWishlist(Long userId, WishListRequestDto wishListRequestDto);
 
     Page<WishListResponseDto> getWishlist(Long userId, int page, int size, String sortBy, boolean isAsc);
