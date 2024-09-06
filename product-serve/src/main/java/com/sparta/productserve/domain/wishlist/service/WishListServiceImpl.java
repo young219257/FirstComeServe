@@ -29,6 +29,17 @@ public class WishListServiceImpl implements WishListService {
     private final WishListItemRepository wishListItemRepository;
     private final ProductService productService;
 
+    /**위시리스트 생성 메소드**/
+    @Override
+    public void createWishList(Long userId) {
+
+        WishList newWishlist=WishList.builder()
+                    .userId(userId)
+                    .build();
+
+        wishlistRepository.save(newWishlist);
+
+    }
     /**위시리스트 품목 추가 메소드 **/
     @Override
     public void addProductToWishlist(Long userId,WishListRequestDto wishListRequestDto) {
@@ -37,14 +48,6 @@ public class WishListServiceImpl implements WishListService {
 
         //user의 위시리스트
         WishList wishList=wishlistRepository.findByUserId(userId);
-
-        if(wishList==null){
-            //wishlist 생성
-            wishList = WishList.builder()
-                    .userId(userId)
-                    .build();
-            wishlistRepository.save(wishList);
-        }
 
         //위시리스트에 wishlistItem 생성
         WishListItem wishListItem=WishListItem.of(wishList,product,wishListRequestDto.getQuantity());
