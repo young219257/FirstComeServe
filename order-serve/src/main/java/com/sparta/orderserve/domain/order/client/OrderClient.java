@@ -39,12 +39,4 @@ public class OrderClient {
                 .bodyToMono(new ParameterizedTypeReference<ApiResponse<ProductDto>>() {});
     }
 
-    //상품 제고 업데이트 하는 메소드
-    public void updateProductStock(ProductDto productDto,int newStockQuantity){
-        webClient.put().
-                uri("http://localhost:8082/api/external/product/{productId}", productDto.getProductId())
-                .bodyValue(new ProductUpdateRequestDto(newStockQuantity))
-                .retrieve()
-                .toBodilessEntity();
-    }
 }
