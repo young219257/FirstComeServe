@@ -9,5 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ProductStockUpdateDto {
 
+    private Long productId;
     private int quantity;
 }
