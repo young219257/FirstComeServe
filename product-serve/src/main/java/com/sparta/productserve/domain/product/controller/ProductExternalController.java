@@ -21,11 +21,4 @@ public class ProductExternalController {
         ProductResponseDto product=productService.getProduct(productId);
         return ApiResponse.ok(HttpStatus.OK.value(), "상품 상세 조회에 성공하셨습니다.",product);
     }
-
-    @PutMapping("/{productId}")
-    public ApiResponse updateProductStock(@PathVariable("productId") Long productId,
-                                          @RequestBody ProductStockUpdateDto productStockUpdateDto){
-        productService.updateProductStock(productId,productStockUpdateDto);
-        return ApiResponse.ok(HttpStatus.OK.value(), "상품 상세 조회에 성공하셨습니다.");
-    }
 }

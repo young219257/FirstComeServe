@@ -1,11 +1,13 @@
 package com.sparta.orderserve.domain.order.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sparta.orderserve.domain.delivery.entity.Delivery;
 import com.sparta.orderserve.domain.delivery.repository.DeliveryRepository;
 import com.sparta.orderserve.domain.order.client.OrderClient;
 import com.sparta.orderserve.domain.order.dto.*;
 import com.sparta.orderserve.domain.order.entity.Order;
 import com.sparta.orderserve.domain.order.entity.OrderItem;
+import com.sparta.orderserve.domain.order.producer.OrderProducer;
 import com.sparta.orderserve.domain.order.repository.OrderItemRepository;
 import com.sparta.orderserve.domain.order.repository.OrderRepository;
 import com.sparta.orderserve.domain.order.type.OrderStatus;
@@ -21,10 +23,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -38,10 +39,11 @@ public class OrderServiceImpl implements OrderService {
     private final OrderItemRepository orderItemRepository;
     private final DeliveryRepository deliveryRepository;
     private final OrderClient orderClient;
+    private final OrderProducer orderProducer;
 
     @Override
     @Transactional
-    public void createOrder(Long userId, OrderRequestDto orderRequestDto) {
+    public void createOrder(Long userId, OrderRequestDto orderRequestDto) throws JsonProcessingException {
 
 
         // 제품 정보 Map 생성
@@ -53,19 +55,20 @@ public class OrderServiceImpl implements OrderService {
         Order order=Order.of(userDto,productMap,orderRequestDto);
         orderRepository.save(order);
 
+
         /**주문 아이템 생성**/
-        for(OrderItemRequestDto itemRequestDto:orderRequestDto.getOrderItems()){
+        List<OrderItemRequestDto> orderItems=orderRequestDto.getOrderItems();
+
+        for(OrderItemRequestDto itemRequestDto:orderItems){
             ProductDto product= orderClient.getProductById(itemRequestDto.getProductId()).block().getData();
 
             OrderItem orderItem=OrderItem.of(order, product.getProductId(), itemRequestDto);
             orderItemRepository.save(orderItem);
 
-
-            //재고 업데이트 요청
-            int newStockQuantity=product.getProductQuantity()-itemRequestDto.getQuantity();
-            orderClient.updateProductStock(product,newStockQuantity);
         }
 
+        //재고 업데이트 요청
+        orderProducer.completeOrder(orderItems);
 
         /**배송 정보 생성**/
         Delivery delivery=Delivery.of(order,orderRequestDto);
@@ -101,24 +104,23 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public void deleteOrder(Long userId, Long orderId) {
+    public void deleteOrder(Long userId, Long orderId) throws JsonProcessingException {
         Order order=getOrderById(orderId);
 
         validateOrder(order); //주문 취소 가능 여부 확인
         order.setOrderStatus(OrderStatus.ORDER_CANCEL);
 
         //주문 상품들에 대한 재고 복구
-        List<OrderItem> orderItems= order.getOrderItems();
-        for(OrderItem orderItem:orderItems){
+        List<ProductUpdateRequestDto> productUpdateRequestDtos=new ArrayList<>();
 
-            ProductDto productDto= orderClient.getProductById(orderItem.getProductId()).block().getData();
+        for(OrderItem orderItem: order.getOrderItems()){
 
-            int newStockQuantity=productDto.getProductQuantity()+ orderItem.getQuantity();
-
-            orderClient.updateProductStock(productDto,newStockQuantity);
-
-            orderItemRepository.save(orderItem);
+            ProductUpdateRequestDto productUpdateRequestDto=ProductUpdateRequestDto.from(orderItem);
+            productUpdateRequestDtos.add(productUpdateRequestDto);
         }
+        orderProducer.deleteOrder(productUpdateRequestDtos);
+
+
 
     }
 

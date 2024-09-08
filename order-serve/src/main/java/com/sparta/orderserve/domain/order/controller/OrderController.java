@@ -1,4 +1,5 @@
 package com.sparta.orderserve.domain.order.controller;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sparta.orderserve.domain.order.dto.OrderRequestDto;
 import com.sparta.orderserve.domain.order.dto.OrderResponseDto;
 import com.sparta.orderserve.domain.order.service.OrderService;
@@ -19,7 +20,7 @@ public class OrderController {
     /** 상품 페이지에서 해당 상품 주문하는 메소드 **/
     @PostMapping
     public ApiResponse createOrder(@RequestHeader("userId") String userId,
-                                   @RequestBody OrderRequestDto orderRequestDto) {
+                                   @RequestBody OrderRequestDto orderRequestDto) throws JsonProcessingException {
         orderService.createOrder(Long.valueOf(userId),orderRequestDto);
         return ApiResponse.ok(HttpStatus.OK.value(), "상품 주문에 완료하였습니다.");
     }
@@ -40,7 +41,7 @@ public class OrderController {
     /** 주문 상품에 대한 취소 **/
     @PutMapping("/{orderId}/cancel")
     public ApiResponse deleteOrder(@RequestHeader("userId") String userId,
-                                   @PathVariable("orderId") Long orderId) {
+                                   @PathVariable("orderId") Long orderId) throws JsonProcessingException {
 
         orderService.deleteOrder(Long.valueOf(userId),orderId);
         return ApiResponse.ok(HttpStatus.OK.value(), "해당 주문이 취소되었습니다.");

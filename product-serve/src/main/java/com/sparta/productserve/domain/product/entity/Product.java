@@ -27,8 +27,11 @@ public class Product extends TimeStamped {
     private Long price;
 
     @Column(nullable = false)
-    @Setter
     private int stockQuantity;
+
+    public void updateStock(int newStock){
+        this.stockQuantity = newStock;
+    }
 
 
 

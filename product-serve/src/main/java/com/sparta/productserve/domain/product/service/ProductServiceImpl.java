@@ -10,6 +10,7 @@ import com.sparta.productserve.global.exception.ErrorCode;
 import com.sparta.productserve.global.exception.NotfoundResourceException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
@@ -42,10 +44,22 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public void updateProductStock(Long productId, ProductStockUpdateDto productStockUpdateDto) {
+    public void updateProductStock(ProductStockUpdateDto productStockUpdateDto) {
 
-        Product product=findProductById(productId);
-        product.setStockQuantity(productStockUpdateDto.getQuantity());
+        log.info(String.valueOf(productStockUpdateDto.getQuantity()));
+
+        Product product=findProductById(productStockUpdateDto.getProductId());
+        product.updateStock(product.getStockQuantity()-productStockUpdateDto.getQuantity());
+
+        log.info(String.valueOf(product.getStockQuantity()));
+    }
+
+    @Override
+    @Transactional
+    public void undoProductStock(ProductStockUpdateDto productStockUpdateDto) {
+        Product product=findProductById(productStockUpdateDto.getProductId());
+        product.updateStock(product.getStockQuantity()+productStockUpdateDto.getQuantity());
+
     }
 
     private Product findProductById(Long productId) {

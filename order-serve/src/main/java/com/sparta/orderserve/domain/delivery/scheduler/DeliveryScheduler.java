@@ -1,10 +1,11 @@
 package com.sparta.orderserve.domain.delivery.scheduler;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sparta.orderserve.domain.delivery.type.DeliveryStatus;
-import com.sparta.orderserve.domain.order.client.OrderClient;
-import com.sparta.orderserve.domain.order.dto.ProductDto;
+import com.sparta.orderserve.domain.order.dto.ProductUpdateRequestDto;
 import com.sparta.orderserve.domain.order.entity.Order;
 import com.sparta.orderserve.domain.order.entity.OrderItem;
+import com.sparta.orderserve.domain.order.producer.OrderProducer;
 import com.sparta.orderserve.domain.order.repository.OrderRepository;
 import com.sparta.orderserve.domain.order.type.OrderStatus;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -21,7 +23,8 @@ import java.util.List;
 public class DeliveryScheduler {
 
     private final OrderRepository orderRepository;
-    private final OrderClient orderClient;
+    private final OrderProducer orderProducer;
+
 
     @Scheduled(cron = "0 0 12,18 * * *") // 매일 12시, 18시
     public void updateDelivery() {
@@ -53,7 +56,7 @@ public class DeliveryScheduler {
     }
 
     @Scheduled(cron = "0 0 14,20 * * *") // 매일 14시, 20시
-    public void updateStockAndOrderStatus() {
+    public void updateStockAndOrderStatus() throws JsonProcessingException {
         log.info("반품 신청으로부터 1일 후 재고 복구, 주문 상태 전환");
         List<Order> orders = orderRepository.findAllByOrderStatus(OrderStatus.SIGN_RETURN);
         for (Order order : orders) {
@@ -67,20 +70,17 @@ public class DeliveryScheduler {
         return LocalDateTime.now().isAfter(order.getReturnSignedAt().plusDays(1));
     }
 
-    private void processReturn(Order order) {
+    private void processReturn(Order order) throws JsonProcessingException {
+
+        List<ProductUpdateRequestDto> productUpdateRequestDtos=new ArrayList<>();
+
         for (OrderItem orderItem : order.getOrderItems()) {
-            updateProductStock(orderItem);
+            //주문 상품들에 대한 재고 복구
+            ProductUpdateRequestDto productUpdateRequestDto=ProductUpdateRequestDto.from(orderItem);
+            productUpdateRequestDtos.add(productUpdateRequestDto);
         }
+        orderProducer.returnOrder(productUpdateRequestDtos);
         order.setOrderStatus(OrderStatus.RETURN); // 변경된 상태
     }
 
-    private void updateProductStock(OrderItem orderItem) {
-
-        ProductDto productDto= orderClient.getProductById(orderItem.getProductId()).block().getData();
-
-        //재고 복구
-        int newStock=productDto.getProductQuantity()+orderItem.getQuantity();
-
-        orderClient.updateProductStock(productDto,newStock);
-    }
 }
