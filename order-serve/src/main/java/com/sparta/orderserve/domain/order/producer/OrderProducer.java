@@ -5,7 +5,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.orderserve.domain.order.dto.OrderItemRequestDto;
 import com.sparta.orderserve.domain.order.dto.ProductUpdateRequestDto;
+import com.sparta.orderserve.global.exception.ErrorCode;
+import com.sparta.orderserve.global.exception.handler.dto.ApiResponse;
+import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -15,14 +19,12 @@ import java.util.List;
 @Service
 public class OrderProducer {
 
-    //개발 서버, 운영 서버 분리
-    //properties로 관리
-    //보상트랜잭션
-    //분산트랜잭션
-    //에러 발생 시 consumer->producer로 보냄..?
-    private static final String ORDER_COMPLETE_TOPIC="complete_order";
-    private static final String ORDER_UPDATE_TOPIC="delete_order";
-    private static final String RETURN_TOPIC="return_order";
+    @Value("${order.complete.topic}")
+    private String ORDER_COMPLETE_TOPIC;
+    @Value("${order.update.topic}")
+    private String ORDER_UPDATE_TOPIC;
+    @Value("${order.return.topic}")
+    private String RETURN_TOPIC;
 
     private final KafkaTemplate<String, String> kafkaTemplate;
 
