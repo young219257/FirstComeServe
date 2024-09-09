@@ -2,8 +2,6 @@ package com.sparta.userserve.global.security.filter;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.userserve.domain.user.entity.User;
-import com.sparta.userserve.domain.user.repository.UserRepository;
 import com.sparta.userserve.global.security.service.CustomUserDetails;
 import com.sparta.userserve.global.security.service.CustomUserDetailsService;
 import com.sparta.userserve.global.security.utils.EncryptionUtils;
