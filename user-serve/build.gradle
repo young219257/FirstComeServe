@@ -4,6 +4,10 @@ plugins {
     id 'io.spring.dependency-management' version '1.1.6'
 }
 
+ext {
+    springCloudVersion = "2022.0.4"
+}
+
 group = 'com.sparta'
 version = '0.0.1-SNAPSHOT'
 
@@ -24,9 +28,10 @@ repositories {
 }
 
 dependencies {
-    //Kafka
 
+    //Kafka
     implementation 'org.springframework.kafka:spring-kafka'
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
     testImplementation 'org.springframework.kafka:spring-kafka-test'
 
     //webClient
@@ -52,6 +57,12 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:$springCloudVersion"
+    }
 }
 tasks.named('test') {
     useJUnitPlatform()
