@@ -3,6 +3,7 @@ package com.sparta.productserve.domain.product.service;
 
 import com.sparta.productserve.domain.product.dto.ProductListResponseDto;
 import com.sparta.productserve.domain.product.dto.ProductResponseDto;
+import com.sparta.productserve.domain.product.dto.ProductStockDto;
 import com.sparta.productserve.domain.product.dto.ProductStockUpdateDto;
 import com.sparta.productserve.domain.product.entity.Product;
 import com.sparta.productserve.domain.product.repository.ProductRepository;
@@ -49,7 +50,12 @@ public class ProductServiceImpl implements ProductService {
         log.info(String.valueOf(productStockUpdateDto.getQuantity()));
 
         Product product=findProductById(productStockUpdateDto.getProductId());
-        product.updateStock(product.getStockQuantity()-productStockUpdateDto.getQuantity());
+        int newStock=product.getStockQuantity()-productStockUpdateDto.getQuantity();
+//
+//        if(newStock<0){
+//            throw new
+//        }
+        product.updateStock(newStock);
 
         log.info(String.valueOf(product.getStockQuantity()));
     }
@@ -60,6 +66,12 @@ public class ProductServiceImpl implements ProductService {
         Product product=findProductById(productStockUpdateDto.getProductId());
         product.updateStock(product.getStockQuantity()+productStockUpdateDto.getQuantity());
 
+    }
+
+    @Override
+    public ProductStockDto getProductStock(Long productId) {
+        Product product=findProductById(productId);
+        return ProductStockDto.builder().stock(product.getStockQuantity()).build();
     }
 
     private Product findProductById(Long productId) {
