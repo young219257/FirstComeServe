@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductStockUpdateDto {
+public class StockUpdateDto {
 
     private Long productId;
     private int quantity;
