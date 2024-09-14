@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class WishListUpdateRequestDto {
+public class WishListUpdateDto {
     private int quantity;
 }

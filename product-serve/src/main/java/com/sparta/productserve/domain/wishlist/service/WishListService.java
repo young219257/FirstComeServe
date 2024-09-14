@@ -4,6 +4,7 @@ package com.sparta.productserve.domain.wishlist.service;
 import com.sparta.productserve.domain.product.dto.ProductResponseDto;
 import com.sparta.productserve.domain.wishlist.dto.WishListRequestDto;
 import com.sparta.productserve.domain.wishlist.dto.WishListResponseDto;
+import com.sparta.productserve.domain.wishlist.dto.WishListUpdateDto;
 import org.springframework.data.domain.Page;
 
 public interface WishListService {
@@ -14,7 +15,7 @@ public interface WishListService {
 
     Page<WishListResponseDto> getWishlist(Long userId, int page, int size, String sortBy, boolean isAsc);
 
-    void updateWishListItemQuantity(Long userId, Long wishListItemId, WishListRequestDto wishListUpdateRequestDto);
+    void updateWishListItemQuantity(Long userId, Long wishListItemId, WishListUpdateDto wishListUpdateDto);
 
     void deleteWishListItem(Long userId, Long wishListItemId);
 

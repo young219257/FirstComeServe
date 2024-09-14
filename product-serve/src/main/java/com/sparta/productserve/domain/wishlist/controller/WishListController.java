@@ -3,6 +3,7 @@ package com.sparta.productserve.domain.wishlist.controller;
 import com.sparta.productserve.domain.product.dto.ProductResponseDto;
 import com.sparta.productserve.domain.wishlist.dto.WishListRequestDto;
 import com.sparta.productserve.domain.wishlist.dto.WishListResponseDto;
+import com.sparta.productserve.domain.wishlist.dto.WishListUpdateDto;
 import com.sparta.productserve.domain.wishlist.service.WishListService;
 import com.sparta.productserve.global.exception.handler.dto.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -58,9 +59,9 @@ public class WishListController {
     @PutMapping("/wishlist/{wishListItemId}")
     public ApiResponse updateWishListItemQuantity(@RequestHeader("userId") String userId,
                                                   @PathVariable("wishListItemId") Long wishListItemId,
-                                                  @RequestBody WishListRequestDto wishListUpdateRequestDto){
+                                                  @RequestBody WishListUpdateDto wishListUpdateDto){
 
-        wishlistService.updateWishListItemQuantity(Long.valueOf(userId),wishListItemId,wishListUpdateRequestDto);
+        wishlistService.updateWishListItemQuantity(Long.valueOf(userId),wishListItemId,wishListUpdateDto);
         return ApiResponse.ok(HttpStatus.OK.value(), "상품의 수량이 변경되었습니다.");
     }
 
