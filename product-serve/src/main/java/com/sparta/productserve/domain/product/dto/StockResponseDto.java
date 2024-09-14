@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class ProductStockDto {
+public class StockResponseDto {
+    Long productId;
+    String productName;
     int stock;
-
 }
