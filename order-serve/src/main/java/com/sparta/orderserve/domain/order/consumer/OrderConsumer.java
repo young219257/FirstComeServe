@@ -20,6 +20,6 @@ public class OrderConsumer {
     @KafkaListener(topics="payment_complete_topic",groupId = "payment_group")
     public void updateOrderStatus(ConsumerRecord<String, String> record) throws JsonProcessingException {
         String orderId = record.value();
-        orderService.completedOrder(Long.valueOf(orderId));
+        orderService.completeOrder(Long.valueOf(orderId));
     }
 }
