@@ -1,7 +1,6 @@
 package com.sparta.productserve.domain.product.controller;
 
 import com.sparta.productserve.domain.product.dto.ProductResponseDto;
-import com.sparta.productserve.domain.product.dto.ProductStockUpdateDto;
 import com.sparta.productserve.domain.product.service.ProductService;
 import com.sparta.productserve.global.exception.handler.dto.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +16,7 @@ public class ProductExternalController {
 
 
     @GetMapping("/{productId}")
-    public ApiResponse<ProductResponseDto> getProductById(@PathVariable("productId") Long productId) {
+    public ApiResponse<ProductResponseDto> sendProductInfo(@PathVariable("productId") Long productId) {
         ProductResponseDto product=productService.getProduct(productId);
         return ApiResponse.ok(HttpStatus.OK.value(), "상품 상세 조회에 성공하셨습니다.",product);
     }
