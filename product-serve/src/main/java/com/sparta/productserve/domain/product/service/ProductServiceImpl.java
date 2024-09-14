@@ -3,11 +3,14 @@ package com.sparta.productserve.domain.product.service;
 
 import com.sparta.productserve.domain.product.dto.ProductListResponseDto;
 import com.sparta.productserve.domain.product.dto.ProductResponseDto;
-import com.sparta.productserve.domain.product.dto.ProductStockDto;
-import com.sparta.productserve.domain.product.dto.ProductStockUpdateDto;
+import com.sparta.productserve.domain.product.dto.StockResponseDto;
+import com.sparta.productserve.domain.product.dto.StockUpdateDto;
 import com.sparta.productserve.domain.product.entity.Product;
+import com.sparta.productserve.domain.product.entity.Stock;
 import com.sparta.productserve.domain.product.repository.ProductRepository;
+import com.sparta.productserve.domain.product.repository.StockRepository;
 import com.sparta.productserve.global.exception.ErrorCode;
+import com.sparta.productserve.global.exception.InsufficientStockException;
 import com.sparta.productserve.global.exception.NotfoundResourceException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +27,7 @@ import org.springframework.stereotype.Service;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
+    private final StockRepository stockRepository;
 
     @Override
     public Page<ProductListResponseDto> getAllProducts(int page, int size, String sortBy, boolean isAsc) {
@@ -40,41 +44,49 @@ public class ProductServiceImpl implements ProductService {
 
         Product product=findProductById(productId);
 
-        return ProductResponseDto.of(product);
+        return ProductResponseDto.from(product);
     }
 
     @Override
     @Transactional
-    public void updateProductStock(ProductStockUpdateDto productStockUpdateDto) {
+    public void updateProductStock(StockUpdateDto stockUpdateDto) {
 
-        log.info(String.valueOf(productStockUpdateDto.getQuantity()));
+        Stock stock=findStockByProductId(stockUpdateDto.getProductId());
+        int newQuantity=stock.getQuantity()- stockUpdateDto.getQuantity();
 
-        Product product=findProductById(productStockUpdateDto.getProductId());
-        int newStock=product.getStockQuantity()-productStockUpdateDto.getQuantity();
-//
-//        if(newStock<0){
-//            throw new
-//        }
-        product.updateStock(newStock);
+        //재고 부족일 때 주문 불가
+        if(newQuantity<0){
+            throw new InsufficientStockException(ErrorCode.INSUFFICIENT_STOCK);
+        }
+        stock.updateQuantity(newQuantity);
 
-        log.info(String.valueOf(product.getStockQuantity()));
     }
 
     @Override
     @Transactional
-    public void undoProductStock(ProductStockUpdateDto productStockUpdateDto) {
-        Product product=findProductById(productStockUpdateDto.getProductId());
-        product.updateStock(product.getStockQuantity()+productStockUpdateDto.getQuantity());
+    public void undoProductStock(StockUpdateDto stockUpdateDto) {
+
+        Stock newStock=findStockByProductId(stockUpdateDto.getProductId());
+        int newQuantity=newStock.getQuantity()+ stockUpdateDto.getQuantity();
+        newStock.updateQuantity(newQuantity);
 
     }
 
     @Override
-    public ProductStockDto getProductStock(Long productId) {
+    public StockResponseDto getProductStock(Long productId) {
         Product product=findProductById(productId);
-        return ProductStockDto.builder().stock(product.getStockQuantity()).build();
+        Stock stock=findStockByProductId(productId);
+        return StockResponseDto.builder().
+                productId(productId).
+                productName(product.getProductName()).
+                stock(stock.getQuantity()).build();
     }
 
+    private Stock findStockByProductId(Long productId) {
+        return stockRepository.findById(productId).orElseThrow(()->new NotfoundResourceException(ErrorCode.NOTFOUND_PRODUCT));
+    }
     private Product findProductById(Long productId) {
+        log.info("Looking for product with id: {}", productId);
         return productRepository.findById(productId).orElseThrow(()->new NotfoundResourceException(ErrorCode.NOTFOUND_PRODUCT));
 
     }

@@ -2,9 +2,8 @@ package com.sparta.productserve.domain.product.service;
 
 import com.sparta.productserve.domain.product.dto.ProductListResponseDto;
 import com.sparta.productserve.domain.product.dto.ProductResponseDto;
-import com.sparta.productserve.domain.product.dto.ProductStockDto;
-import com.sparta.productserve.domain.product.dto.ProductStockUpdateDto;
-import jakarta.transaction.Transactional;
+import com.sparta.productserve.domain.product.dto.StockResponseDto;
+import com.sparta.productserve.domain.product.dto.StockUpdateDto;
 import org.springframework.data.domain.Page;
 
 public interface ProductService {
@@ -13,9 +12,9 @@ public interface ProductService {
 
     ProductResponseDto getProduct(Long productId);
 
-    void updateProductStock(ProductStockUpdateDto productStockUpdateDto);
+    void updateProductStock(StockUpdateDto stockUpdateDto);
 
-    void undoProductStock(ProductStockUpdateDto dto);
+    void undoProductStock(StockUpdateDto dto);
 
-    ProductStockDto getProductStock(Long productId);
+    StockResponseDto getProductStock(Long productId);
 }
