@@ -38,12 +38,6 @@ public class User {
     @Column(nullable = false)
     private boolean emailVerified;
 
-//    Instead @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
-//    private List<Order> orders;
-
-//    @OneToOne(mappedBy = "user",cascade = CascadeType.REMOVE)
-//    private WishList wishList;
-
 
     public static User of(SignupDto requestDto, BCryptPasswordEncoder encoder){
 
@@ -59,7 +53,7 @@ public class User {
                 .build();
     }
 
-    public void setEmailVerified(boolean b) {
+    public void updateEmailVerified(boolean b) {
         this.emailVerified = b;
     }
 
