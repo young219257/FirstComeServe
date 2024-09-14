@@ -15,13 +15,9 @@ import com.sparta.userserve.global.security.utils.JwtUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.apache.kafka.clients.producer.KafkaProducer;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.util.Optional;
@@ -70,7 +66,7 @@ public class UserServiceImpl implements UserService {
         if (email != null) {
             User user = findUserByEmail(email);
             if (user != null) {
-                user.setEmailVerified(true);
+                user.updateEmailVerified(true);
                 userRepository.save(user);
                 redisTemplate.delete(token);
 

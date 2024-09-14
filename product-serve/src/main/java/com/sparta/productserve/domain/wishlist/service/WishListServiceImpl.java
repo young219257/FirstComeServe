@@ -6,6 +6,7 @@ import com.sparta.productserve.domain.product.repository.ProductRepository;
 import com.sparta.productserve.domain.product.service.ProductService;
 import com.sparta.productserve.domain.wishlist.dto.WishListRequestDto;
 import com.sparta.productserve.domain.wishlist.dto.WishListResponseDto;
+import com.sparta.productserve.domain.wishlist.dto.WishListUpdateDto;
 import com.sparta.productserve.domain.wishlist.entity.WishList;
 import com.sparta.productserve.domain.wishlist.entity.WishListItem;
 import com.sparta.productserve.domain.wishlist.repository.WishListItemRepository;
@@ -81,9 +82,9 @@ public class WishListServiceImpl implements WishListService {
     /**위시리스트 품목 수량 변경 메소드 **/
     @Override
     @Transactional
-    public void updateWishListItemQuantity(Long userId, Long wishListItemId, WishListRequestDto wishListUpdateRequestDto) {
+    public void updateWishListItemQuantity(Long userId, Long wishListItemId, WishListUpdateDto wishListUpdateDto) {
         WishListItem wishListItem=findWishlistItem(wishListItemId);
-        wishListItem.setQuantity(wishListUpdateRequestDto.getQuantity());
+        wishListItem.setQuantity(wishListUpdateDto.getQuantity());
         wishListItemRepository.save(wishListItem);
     }
 

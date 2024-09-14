@@ -19,6 +19,7 @@ public class UserProducer {
 
 
 
+    //회원가입 완료 event 발행
     public void sendSignupCompleteEvent(Long userId) {
 
         kafkaTemplate.send(TOPIC, userId.toString());

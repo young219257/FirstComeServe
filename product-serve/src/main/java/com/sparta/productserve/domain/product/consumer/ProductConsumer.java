@@ -2,7 +2,7 @@ package com.sparta.productserve.domain.product.consumer;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.productserve.domain.product.dto.ProductStockUpdateDto;
+import com.sparta.productserve.domain.product.dto.StockUpdateDto;
 import com.sparta.productserve.domain.product.service.ProductService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -21,51 +21,42 @@ public class ProductConsumer {
     public ProductConsumer(ProductService productService) {
         this.productService = productService;
         this.mapper = new ObjectMapper();
-
     }
-
 
     @KafkaListener(topics={"complete_order","delete_order","return_order"}, groupId = "order_group")
     public void addOrder(ConsumerRecord<String, String> record) {
-
+        log.info("Received Kafka message on topic: {}, value: {}", record.topic(), record.value()); // 로그 추가
 
         try {
             // Json을 객체로 변경
-            List<ProductStockUpdateDto> productStockUpdateDtos =
-                    mapper.readValue(record.value(), new TypeReference<List<ProductStockUpdateDto>>() {});
+            List<StockUpdateDto> stockUpdateDtos =
+                    mapper.readValue(record.value(), new TypeReference<List<StockUpdateDto>>() {});
 
             switch (record.topic()) {
                 case "complete_order":
-                    updateStock(productStockUpdateDtos);
+                    updateStock(stockUpdateDtos);
                     break;
                 case "delete_order":
-                    undoStock(productStockUpdateDtos);
+                    undoStock(stockUpdateDtos);
                     break;
                 case "return_order":
-                    undoStock(productStockUpdateDtos);
+                    undoStock(stockUpdateDtos);
                     break;
-
             }
-
         } catch (Exception e) {
             log.error("Kafka 메시지 처리 중 오류 발생: {}", e.getMessage(), e);
         }
-
     }
 
-
-    // 재고 업데이트
-    private void updateStock(List<ProductStockUpdateDto> productStockUpdateDtos) {
-        for (ProductStockUpdateDto dto : productStockUpdateDtos) {
+    private void updateStock(List<StockUpdateDto> stockUpdateDtos) {
+        for (StockUpdateDto dto : stockUpdateDtos) {
             productService.updateProductStock(dto);
         }
     }
 
-    // 재고 되돌리기
-    private void undoStock(List<ProductStockUpdateDto> productStockUpdateDtos) {
-        for (ProductStockUpdateDto dto : productStockUpdateDtos) {
+    private void undoStock(List<StockUpdateDto> stockUpdateDtos) {
+        for (StockUpdateDto dto : stockUpdateDtos) {
             productService.undoProductStock(dto);
         }
     }
-
 }

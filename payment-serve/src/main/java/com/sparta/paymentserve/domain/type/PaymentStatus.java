@@ -1,4 +1,4 @@
-package com.sparta.paymentserve.domain.entity;
+package com.sparta.paymentserve.domain.type;
 
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;

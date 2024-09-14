@@ -11,15 +11,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-public class ProductUpdateRequestDto {
+public class StockUpdateDto {
 
     private Long productId;
     private int quantity;
 
 
-    public static ProductUpdateRequestDto from(OrderItem orderItem){
+    public static StockUpdateDto from(OrderItem orderItem){
 
-        return ProductUpdateRequestDto.
+        return StockUpdateDto.
                 builder().
                 productId(orderItem.getProductId()).
                 quantity(orderItem.getQuantity()).build();

@@ -2,7 +2,7 @@ package com.sparta.orderserve.domain.delivery.scheduler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sparta.orderserve.domain.delivery.type.DeliveryStatus;
-import com.sparta.orderserve.domain.order.dto.ProductUpdateRequestDto;
+import com.sparta.orderserve.domain.order.dto.StockUpdateDto;
 import com.sparta.orderserve.domain.order.entity.Order;
 import com.sparta.orderserve.domain.order.entity.OrderItem;
 import com.sparta.orderserve.domain.order.producer.OrderProducer;
@@ -72,14 +72,14 @@ public class DeliveryScheduler {
 
     private void processReturn(Order order) throws JsonProcessingException {
 
-        List<ProductUpdateRequestDto> productUpdateRequestDtos=new ArrayList<>();
+        List<StockUpdateDto> stockUpdateDtos =new ArrayList<>();
 
         for (OrderItem orderItem : order.getOrderItems()) {
             //주문 상품들에 대한 재고 복구
-            ProductUpdateRequestDto productUpdateRequestDto=ProductUpdateRequestDto.from(orderItem);
-            productUpdateRequestDtos.add(productUpdateRequestDto);
+            StockUpdateDto stockUpdateDto = StockUpdateDto.from(orderItem);
+            stockUpdateDtos.add(stockUpdateDto);
         }
-        orderProducer.returnOrder(productUpdateRequestDtos);
+        orderProducer.returnOrder(stockUpdateDtos);
         order.setOrderStatus(OrderStatus.RETURN); // 변경된 상태
     }
 

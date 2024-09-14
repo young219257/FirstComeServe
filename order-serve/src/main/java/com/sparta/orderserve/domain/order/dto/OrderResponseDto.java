@@ -18,13 +18,10 @@ public class OrderResponseDto {
     private List<OrderItemResponseDto> orderItems;
 
 
-    public static OrderResponseDto from(Order order, ProductDto productDto) {
+    public static OrderResponseDto from(Order order,List<OrderItemResponseDto> orderItems) {
         return OrderResponseDto.builder()
                 .orderId(order.getId())
-                .orderItems(order.getOrderItems().stream()
-                        .map(orderItem -> OrderItemResponseDto.of(orderItem, productDto))
-                        .toList())
-                .build();
+                .orderItems(orderItems).build();
     }
 
 }

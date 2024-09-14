@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class OrderServiceImpl implements OrderService {
+
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final DeliveryRepository deliveryRepository;
@@ -45,35 +46,52 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public void createOrder(Long userId, OrderRequestDto orderRequestDto) throws JsonProcessingException {
 
-
         // 제품 정보 Map 생성
         Map<Long, ProductDto> productMap = orderRequestDto.getOrderItems().stream()
                 .collect(Collectors.toMap(OrderItemRequestDto::getProductId, item -> Objects.requireNonNull(orderClient.getProductById(item.getProductId()).block()).getData()));
 
         UserDto userDto= orderClient.getUserById(userId).block().getData();
+
         /**주문 생성**/
         Order order=Order.of(userDto,productMap,orderRequestDto);
         orderRepository.save(order);
-
 
         /**주문 아이템 생성**/
         List<OrderItemRequestDto> orderItems=orderRequestDto.getOrderItems();
 
         for(OrderItemRequestDto itemRequestDto:orderItems){
             ProductDto product= orderClient.getProductById(itemRequestDto.getProductId()).block().getData();
-
             OrderItem orderItem=OrderItem.of(order, product.getProductId(), itemRequestDto);
             orderItemRepository.save(orderItem);
 
         }
 
-        //재고 업데이트 요청
-        orderProducer.completeOrder(orderItems);
-
         /**배송 정보 생성**/
         Delivery delivery=Delivery.of(order,orderRequestDto);
         deliveryRepository.save(delivery);
 
+
+    }
+
+    @Override
+    @Transactional
+    public void completeOrder(Long orderId) throws JsonProcessingException {
+        // 주문 조회
+        Order order = findOrderById(orderId);
+
+        // 주문 상태를 'ORDER_START'로 변경
+        order.updateOrderStatus(OrderStatus.ORDER_START);
+
+       //  주문 아이템 목록 조회
+        List<OrderItem> orderItems = order.getOrderItems();
+
+        // OrderItem을 OrderItemRequestDto로 변환
+        List<OrderItemRequestDto> orderItemRequestDtos = orderItems.stream()
+                .map(OrderItemRequestDto::from)
+                .collect(Collectors.toList());
+
+        // Kafka로 재고 업데이트 요청
+        orderProducer.completeOrder(orderItemRequestDtos);
     }
 
     @Override
@@ -85,6 +103,7 @@ public class OrderServiceImpl implements OrderService {
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
 
         Page<Order> orders=orderRepository.findAllByUserId(userId,pageable);
+
         // OrderResponseDto로 매핑
         return orders.map(order -> {
             // 각 OrderItem에 대해 ProductDto를 가져옴
@@ -95,30 +114,27 @@ public class OrderServiceImpl implements OrderService {
                     })
                     .toList();
 
-            return OrderResponseDto.builder()
-                    .orderId(order.getId())
-                    .orderItems(orderItemResponseDtos)
-                    .build();
+            return OrderResponseDto.from(order,orderItemResponseDtos);
         });
     }
 
     @Override
     @Transactional
     public void deleteOrder(Long userId, Long orderId) throws JsonProcessingException {
-        Order order=getOrderById(orderId);
+        Order order= findOrderById(orderId);
 
         validateOrder(order); //주문 취소 가능 여부 확인
         order.setOrderStatus(OrderStatus.ORDER_CANCEL);
 
         //주문 상품들에 대한 재고 복구
-        List<ProductUpdateRequestDto> productUpdateRequestDtos=new ArrayList<>();
+        List<StockUpdateDto> stockUpdateDtos =new ArrayList<>();
 
         for(OrderItem orderItem: order.getOrderItems()){
 
-            ProductUpdateRequestDto productUpdateRequestDto=ProductUpdateRequestDto.from(orderItem);
-            productUpdateRequestDtos.add(productUpdateRequestDto);
+            StockUpdateDto stockUpdateDto = StockUpdateDto.from(orderItem);
+            stockUpdateDtos.add(stockUpdateDto);
         }
-        orderProducer.deleteOrder(productUpdateRequestDtos);
+        orderProducer.deleteOrder(stockUpdateDtos);
 
 
 
@@ -132,7 +148,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public void returnOrder(Long userId, Long orderId) {
 
-        Order order=getOrderById(orderId);
+        Order order= findOrderById(orderId);
         //배송 완료일로부터 +1 인 경우
         if(LocalDateTime.now().isAfter(order.getDelivery().getCompletedAt().plusDays(2))){
             throw new InvalidReturnException(ErrorCode.CANNOT_BE_RETURN);
@@ -144,9 +160,19 @@ public class OrderServiceImpl implements OrderService {
 
     }
 
+    @Override
+    public OrderDto getOrderInfo(Long orderId) {
+        Order order= findOrderById(orderId);
+
+        return OrderDto.builder().
+                totalOrderPrice(order.getTotalPrice()).orderStatus(String.valueOf(order.getOrderStatus())).
+                build();
+
+    }
+
 
     //주문 가져오는 메소드
-    public Order getOrderById(Long orderId) {
+    public Order findOrderById(Long orderId) {
         return orderRepository.findById(orderId).orElseThrow(()->new NotfoundResourceException(ErrorCode.NOTFOUND_ORDER));
     }
 

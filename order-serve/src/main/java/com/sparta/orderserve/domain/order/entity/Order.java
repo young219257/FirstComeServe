@@ -74,7 +74,7 @@ public class Order extends TimeStamped {
                 userId(userDto.getId()).
                 totalPrice(totalPrice).
                 orderer(userDto.getUsername()).
-                orderStatus(OrderStatus.ORDER_START).
+                orderStatus(OrderStatus.ORDER_READY).
                 build();
     }
 
@@ -82,6 +82,10 @@ public class Order extends TimeStamped {
     public void signedReturn(Order order){
         order.setOrderStatus(OrderStatus.SIGN_RETURN);
         order.setReturnSignedAt(LocalDateTime.now());
+    }
+
+    public void updateOrderStatus(OrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
     }
 
     //주문자를 받아오는

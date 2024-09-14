@@ -1,6 +1,8 @@
 package com.sparta.paymentserve.domain.entity;
 
 
+import com.sparta.paymentserve.domain.type.PaymentMethods;
+import com.sparta.paymentserve.domain.type.PaymentStatus;
 import com.sparta.paymentserve.global.entity.TimeStamped;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -9,7 +11,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @NoArgsConstructor
@@ -40,6 +41,18 @@ public class Payment extends TimeStamped {
     private int deliveryPrice;
 
     @Column(nullable = false)
+    private int totalPaymentAmount;
+
+    @Column
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime paymentCompletedAt;
+
+    public void updatePaymentStatus(PaymentStatus paymentStatus) {
+        this.status = paymentStatus;
+    }
+
+    public void approvedPayment() {
+        this.paymentCompletedAt=LocalDateTime.now();
+        this.status=PaymentStatus.PAYMENT_APPROVE;
+    }
 }

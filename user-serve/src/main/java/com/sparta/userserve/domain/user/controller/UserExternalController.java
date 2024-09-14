@@ -22,7 +22,7 @@ public class UserExternalController {
 
     //회원 정보 가져오는 메소드
     @GetMapping("{userId}")
-    public ApiResponse<UserResponseDto> getUser(@PathVariable Long userId) {
+    public ApiResponse<UserResponseDto> sendUserInfo(@PathVariable Long userId) {
         UserResponseDto userResponseDto = userService.getUser(userId);
         if(userResponseDto == null){
             throw new NotfoundResourceException(ErrorCode.NOTFOUND_USER);

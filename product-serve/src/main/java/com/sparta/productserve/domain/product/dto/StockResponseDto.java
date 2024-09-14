@@ -1,14 +1,16 @@
 package com.sparta.productserve.domain.product.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
-@NoArgsConstructor
+@Builder
 @AllArgsConstructor
-public class ProductStockUpdateDto {
-
-    private Long productId;
-    private int quantity;
+@NoArgsConstructor
+@Getter
+public class StockResponseDto {
+    Long productId;
+    String productName;
+    int stock;
 }
