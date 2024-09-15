@@ -34,19 +34,18 @@ public class Order extends TimeStamped {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    @Setter
     private OrderStatus orderStatus;
 
     @Column(nullable = false)
-    private long totalPrice;
+    private Long totalPrice;
 
     @Column
-    @Setter
     LocalDateTime returnSignedAt;
 
 
     @Column(nullable = false)
     private Long userId;
+
 
     @OneToMany(mappedBy = "order",cascade = CascadeType.REMOVE)
     private List<OrderItem> orderItems;
@@ -58,7 +57,7 @@ public class Order extends TimeStamped {
 
     public static Order of(UserDto userDto, Map<Long, ProductDto> productMap, OrderRequestDto orderRequestDto) {
 
-        int totalPrice=0;
+        Long totalPrice= 0L;
 
         // 총 가격을 계산
         for (OrderItemRequestDto item : orderRequestDto.getOrderItems()) {
@@ -74,14 +73,14 @@ public class Order extends TimeStamped {
                 userId(userDto.getId()).
                 totalPrice(totalPrice).
                 orderer(userDto.getUsername()).
-                orderStatus(OrderStatus.ORDER_READY).
+                orderStatus(OrderStatus.ORDER_PROCESSING).
                 build();
     }
 
 
-    public void signedReturn(Order order){
-        order.setOrderStatus(OrderStatus.SIGN_RETURN);
-        order.setReturnSignedAt(LocalDateTime.now());
+    public void signedReturn(){
+        this.orderStatus=OrderStatus.SIGN_RETURN;
+        this.returnSignedAt=LocalDateTime.now();
     }
 
     public void updateOrderStatus(OrderStatus orderStatus) {
