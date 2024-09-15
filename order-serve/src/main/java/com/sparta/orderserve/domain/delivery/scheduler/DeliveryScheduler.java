@@ -80,7 +80,7 @@ public class DeliveryScheduler {
             stockUpdateDtos.add(stockUpdateDto);
         }
         orderProducer.returnOrder(stockUpdateDtos);
-        order.setOrderStatus(OrderStatus.RETURN); // 변경된 상태
+        order.updateOrderStatus(OrderStatus.RETURN); // 변경된 상태
     }
 
 }
