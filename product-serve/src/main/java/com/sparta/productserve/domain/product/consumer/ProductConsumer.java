@@ -36,15 +36,12 @@ public class ProductConsumer {
                 case "complete_order":
                     updateStock(stockUpdateDtos);
                     break;
-                case "delete_order":
-                    undoStock(stockUpdateDtos);
-                    break;
-                case "return_order":
+                case "delete_order", "return_order":
                     undoStock(stockUpdateDtos);
                     break;
             }
         } catch (Exception e) {
-            log.error("Kafka 메시지 처리 중 오류 발생: {}", e.getMessage(), e);
+            log.error("🚨Kafka 메시지 처리 중 오류 발생: {}", e.getMessage(), e);
         }
     }
 

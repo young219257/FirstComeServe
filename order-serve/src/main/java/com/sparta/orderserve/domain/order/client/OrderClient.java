@@ -21,7 +21,7 @@ public class OrderClient {
 
 
     //user 정보 가져오는 메소드(webClient)
-    public Mono<ApiResponse<UserDto>> getUserById(Long userId){
+    public Mono<ApiResponse<UserDto>> getUserInfo(Long userId){
         return webClient.get()
                 .uri("http://localhost:8080/api/external/user/"+userId)
                 .retrieve()
@@ -29,8 +29,8 @@ public class OrderClient {
     }
 
 
-    // 상품을 가져오는 메소드
-    public Mono<ApiResponse<ProductDto>> getProductById(Long productId) {
+    // 상품 정보를 가져오는 메소드
+    public Mono<ApiResponse<ProductDto>> getProductInfo(Long productId) {
         return webClient.get()
                 .uri("http://localhost:8082/api/external/product/{productId}", productId)
                 .retrieve()

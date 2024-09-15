@@ -23,7 +23,7 @@ public class WishlistConsumer {
             // wishListService를 호출하여 위시리스트 생성
             wishListService.createWishList(Long.valueOf(userId));
         } catch (Exception e) {
-            log.error("Error while processing message: {}", e.getMessage(), e);
+            log.error("🚨전송 중 에러 발생: {}", e.getMessage(), e);
         }
     }
 

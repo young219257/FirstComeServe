@@ -9,7 +9,6 @@ import org.springframework.kafka.annotation.EnableKafka;
 
 @SpringBootApplication
 @EnableJpaAuditing
-@EnableKafka
 @EnableDiscoveryClient
 public class PaymentServeApplication {
 

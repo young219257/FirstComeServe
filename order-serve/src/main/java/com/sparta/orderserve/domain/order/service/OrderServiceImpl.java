@@ -3,6 +3,7 @@ package com.sparta.orderserve.domain.order.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sparta.orderserve.domain.delivery.entity.Delivery;
 import com.sparta.orderserve.domain.delivery.repository.DeliveryRepository;
+import com.sparta.orderserve.domain.delivery.type.DeliveryStatus;
 import com.sparta.orderserve.domain.order.client.OrderClient;
 import com.sparta.orderserve.domain.order.dto.*;
 import com.sparta.orderserve.domain.order.entity.Order;
@@ -48,9 +49,9 @@ public class OrderServiceImpl implements OrderService {
 
         // 제품 정보 Map 생성
         Map<Long, ProductDto> productMap = orderRequestDto.getOrderItems().stream()
-                .collect(Collectors.toMap(OrderItemRequestDto::getProductId, item -> Objects.requireNonNull(orderClient.getProductById(item.getProductId()).block()).getData()));
+                .collect(Collectors.toMap(OrderItemRequestDto::getProductId, item -> Objects.requireNonNull(orderClient.getProductInfo(item.getProductId()).block()).getData()));
 
-        UserDto userDto= orderClient.getUserById(userId).block().getData();
+        UserDto userDto= orderClient.getUserInfo(userId).block().getData();
 
         /**주문 생성**/
         Order order=Order.of(userDto,productMap,orderRequestDto);
@@ -60,7 +61,7 @@ public class OrderServiceImpl implements OrderService {
         List<OrderItemRequestDto> orderItems=orderRequestDto.getOrderItems();
 
         for(OrderItemRequestDto itemRequestDto:orderItems){
-            ProductDto product= orderClient.getProductById(itemRequestDto.getProductId()).block().getData();
+            ProductDto product= orderClient.getProductInfo(itemRequestDto.getProductId()).block().getData();
             OrderItem orderItem=OrderItem.of(order, product.getProductId(), itemRequestDto);
             orderItemRepository.save(orderItem);
 
@@ -79,8 +80,8 @@ public class OrderServiceImpl implements OrderService {
         // 주문 조회
         Order order = findOrderById(orderId);
 
-        // 주문 상태를 'ORDER_START'로 변경
-        order.updateOrderStatus(OrderStatus.ORDER_START);
+        // 주문 상태를 'ORDER_COMPLETE'로 변경
+        order.updateOrderStatus(OrderStatus.ORDER_COMPLETE);
 
        //  주문 아이템 목록 조회
         List<OrderItem> orderItems = order.getOrderItems();
@@ -109,7 +110,7 @@ public class OrderServiceImpl implements OrderService {
             // 각 OrderItem에 대해 ProductDto를 가져옴
             List<OrderItemResponseDto> orderItemResponseDtos = order.getOrderItems().stream()
                     .map(orderItem -> {
-                        ProductDto productDto = orderClient.getProductById(orderItem.getProductId()).block().getData();
+                        ProductDto productDto = orderClient.getProductInfo(orderItem.getProductId()).block().getData();
                         return OrderItemResponseDto.of(orderItem, productDto);
                     })
                     .toList();
@@ -124,7 +125,7 @@ public class OrderServiceImpl implements OrderService {
         Order order= findOrderById(orderId);
 
         validateOrder(order); //주문 취소 가능 여부 확인
-        order.setOrderStatus(OrderStatus.ORDER_CANCEL);
+        order.updateOrderStatus(OrderStatus.ORDER_CANCEL);
 
         //주문 상품들에 대한 재고 복구
         List<StockUpdateDto> stockUpdateDtos =new ArrayList<>();
@@ -149,17 +150,18 @@ public class OrderServiceImpl implements OrderService {
     public void returnOrder(Long userId, Long orderId) {
 
         Order order= findOrderById(orderId);
+        LocalDateTime deliveryCompleteTime=order.getDelivery().getCompletedAt();
         //배송 완료일로부터 +1 인 경우
-        if(LocalDateTime.now().isAfter(order.getDelivery().getCompletedAt().plusDays(2))){
+        if(deliveryCompleteTime==null || LocalDateTime.now().isAfter(deliveryCompleteTime.plusDays(1))){
             throw new InvalidReturnException(ErrorCode.CANNOT_BE_RETURN);
         }
 
         //반품 신청
-        order.signedReturn(order);
-        orderRepository.save(order);
+        order.signedReturn();
 
     }
 
+    //주문 정보를 다른 모듈에 보내는 메소드
     @Override
     public OrderDto getOrderInfo(Long orderId) {
         Order order= findOrderById(orderId);
@@ -177,14 +179,17 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
-    //주문 가능한지 확인하는 메소드
+    //주문 취소 가능한지 확인하는 메소드
     public void validateOrder(Order order) {
 
         OrderStatus orderStatus=order.getOrderStatus();
+        //이미 주문이 취소된 경우
         if(orderStatus.equals(OrderStatus.ORDER_CANCEL)){
             throw new InvalidOrderStatusException(ErrorCode.ORDER_ALREADY_CANCEL);
         }
-        if(!orderStatus.equals(OrderStatus.ORDER_START)){
+        //이미 배송 중이거나 배송이 완료된 경우
+        DeliveryStatus deliveryStatus= order.getDelivery().getDeliveryStatus();
+        if(!deliveryStatus.equals(DeliveryStatus.READY_DELIVERY)){
             throw new InvalidOrderStatusException(ErrorCode.ORDER_CANNOT_BE_CANCEL);
         }
     }
