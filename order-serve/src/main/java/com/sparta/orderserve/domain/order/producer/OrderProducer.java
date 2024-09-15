@@ -43,7 +43,7 @@ public class OrderProducer {
 
         }catch (KafkaException e){
 
-            log.error(e.getMessage());
+            log.error("🚨Kafka 메시지 전송 중 에러 발생 : {}",e.getMessage());
         }
 
     }
@@ -53,9 +53,11 @@ public class OrderProducer {
             ObjectMapper objectMapper = new ObjectMapper();
             String jsonInString=objectMapper.writeValueAsString(products);
             kafkaTemplate.send(deleteTopic, jsonInString);
+            log.info("주문 취소 완료");
+            log.info(jsonInString);
 
         }catch (Exception e){
-            log.error("Kafka 메시지 전송 중 에러 발생 : {}",e.getMessage());
+            log.error("🚨Kafka 메시지 전송 중 에러 발생 : {}",e.getMessage());
         }
     }
 
@@ -64,9 +66,11 @@ public class OrderProducer {
             ObjectMapper objectMapper = new ObjectMapper();
             String jsonInString=objectMapper.writeValueAsString(products);
             kafkaTemplate.send(returnTopic, jsonInString);
+            log.info("반품 완료");
+            log.info(jsonInString);
 
         }catch (Exception e){
-            log.error("Kafka 메시지 전송 중 에러 발생 : {}",e.getMessage());
+            log.error("🚨Kafka 메시지 전송 중 에러 발생 : {}",e.getMessage());
         }
     }
 }
