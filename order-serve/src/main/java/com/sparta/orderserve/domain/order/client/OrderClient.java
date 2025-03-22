@@ -2,7 +2,6 @@ package com.sparta.orderserve.domain.order.client;
 
 
 import com.sparta.orderserve.domain.order.dto.ProductDto;
-import com.sparta.orderserve.domain.order.dto.ProductUpdateRequestDto;
 import com.sparta.orderserve.domain.order.dto.UserDto;
 import com.sparta.orderserve.global.exception.handler.dto.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -11,8 +10,6 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-
-import java.lang.reflect.Type;
 
 @Service
 @RequiredArgsConstructor

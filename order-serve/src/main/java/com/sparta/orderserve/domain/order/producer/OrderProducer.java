@@ -5,11 +5,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.orderserve.domain.order.dto.OrderItemRequestDto;
 import com.sparta.orderserve.domain.order.dto.ProductUpdateRequestDto;
-import com.sparta.orderserve.global.exception.ErrorCode;
-import com.sparta.orderserve.global.exception.handler.dto.ApiResponse;
-import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
