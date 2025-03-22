@@ -15,6 +15,7 @@ import com.sparta.orderserve.global.exception.ErrorCode;
 import com.sparta.orderserve.global.exception.InvalidOrderStatusException;
 import com.sparta.orderserve.global.exception.InvalidReturnException;
 import com.sparta.orderserve.global.exception.NotfoundResourceException;
+import com.sparta.orderserve.global.exception.handler.dto.ApiResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,13 +24,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -44,36 +45,70 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public void createOrder(Long userId, OrderRequestDto orderRequestDto) throws JsonProcessingException {
+        long startTime = System.currentTimeMillis();
+
+//        // 1. 상품 조회 (외부 API)
+//        long productStart = System.currentTimeMillis();
+//        Map<Long, ProductDto> productMap = orderRequestDto.getOrderItems().stream()
+//                .collect(Collectors.toMap(OrderItemRequestDto::getProductId, item ->
+//                        Objects.requireNonNull(orderClient.getProductById(item.getProductId()).block()).getData()));
+//        long productEnd = System.currentTimeMillis();
+//        System.out.println("Product API Response Time: " + (productEnd - productStart) + "ms");
+
+        // 1. 상품 조회 (외부 API) - 병렬 실행
+        long productStart = System.currentTimeMillis();
+
+        List<Mono<ProductDto>> productMonos = orderRequestDto.getOrderItems().stream()
+                .map(item -> orderClient.getProductById(item.getProductId()).map(ApiResponse::getData))
+                .toList();
+
+        Map<Long, ProductDto> productMap = Flux.mergeSequential(productMonos)  // 순서 유지하며 병렬 실행
+                .collectMap(ProductDto::getProductId)
+                .block();
+
+        long productEnd = System.currentTimeMillis();
+        System.out.println("🚀 Product API 병렬 요청 후 응답 시간: " + (productEnd - productStart) + "ms");
 
 
-        // 제품 정보 Map 생성
-        Map<Long, ProductDto> productMap = orderRequestDto.getOrderItems().stream()
-                .collect(Collectors.toMap(OrderItemRequestDto::getProductId, item -> Objects.requireNonNull(orderClient.getProductById(item.getProductId()).block()).getData()));
 
-        UserDto userDto= orderClient.getUserById(userId).block().getData();
-        /**주문 생성**/
-        Order order=Order.of(userDto,productMap,orderRequestDto);
+        // 2. 사용자 조회 (외부 API)
+        long userStart = System.currentTimeMillis();
+        UserDto userDto = orderClient.getUserById(userId).block().getData();
+        long userEnd = System.currentTimeMillis();
+        System.out.println("User API Response Time: " + (userEnd - userStart) + "ms");
+
+        // 3. 주문 저장 (DB)
+        long orderStart = System.currentTimeMillis();
+        Order order = Order.of(userDto, productMap, orderRequestDto);
         orderRepository.save(order);
+        long orderEnd = System.currentTimeMillis();
+        System.out.println("Order DB Save Time: " + (orderEnd - orderStart) + "ms");
 
-
-        /**주문 아이템 생성**/
-        List<OrderItemRequestDto> orderItems=orderRequestDto.getOrderItems();
-
-        for(OrderItemRequestDto itemRequestDto:orderItems){
-            ProductDto product= orderClient.getProductById(itemRequestDto.getProductId()).block().getData();
-
-            OrderItem orderItem=OrderItem.of(order, product.getProductId(), itemRequestDto);
+        // 4. 주문 아이템 저장 (DB)
+        long itemStart = System.currentTimeMillis();
+        for (OrderItemRequestDto itemRequestDto : orderRequestDto.getOrderItems()) {
+            ProductDto product = orderClient.getProductById(itemRequestDto.getProductId()).block().getData();
+            OrderItem orderItem = OrderItem.of(order, product.getProductId(), itemRequestDto);
             orderItemRepository.save(orderItem);
-
         }
+        long itemEnd = System.currentTimeMillis();
+        System.out.println("Order Items DB Save Time: " + (itemEnd - itemStart) + "ms");
 
-        //재고 업데이트 요청
-        orderProducer.completeOrder(orderItems);
+        // 5. 재고 업데이트 (Kafka)
+        long kafkaStart = System.currentTimeMillis();
+        orderProducer.completeOrder(orderRequestDto.getOrderItems());
+        long kafkaEnd = System.currentTimeMillis();
+        System.out.println("Kafka Publish Time: " + (kafkaEnd - kafkaStart) + "ms");
 
-        /**배송 정보 생성**/
-        Delivery delivery=Delivery.of(order,orderRequestDto);
+        // 6. 배송 정보 저장 (DB)
+        long deliveryStart = System.currentTimeMillis();
+        Delivery delivery = Delivery.of(order, orderRequestDto);
         deliveryRepository.save(delivery);
+        long deliveryEnd = System.currentTimeMillis();
+        System.out.println("Delivery DB Save Time: " + (deliveryEnd - deliveryStart) + "ms");
 
+        long endTime = System.currentTimeMillis();
+        System.out.println("Total Execution Time: " + (endTime - startTime) + "ms");
     }
 
     @Override
